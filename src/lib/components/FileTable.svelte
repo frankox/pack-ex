@@ -1,9 +1,6 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	
 	export let files: any[] = [];
-	
-	const dispatch = createEventDispatcher();
+	export let onRefresh: (() => void) | undefined = undefined;
 	
 	function formatFileSize(bytes: number): string {
 		if (bytes === 0) return '0 Bytes';
@@ -24,7 +21,7 @@
 	}
 	
 	function getCategoryLabel(category: string): string {
-		const labels = {
+		const labels: Record<string, string> = {
 			'LEADERSHIP': 'Leadership',
 			'MANAGING_COMPLEXITY': 'Managing Complexity',
 			'INNOVATION': 'Innovation',
@@ -38,7 +35,7 @@
 	}
 	
 	function getLanguageLabel(language: string): string {
-		const labels = {
+		const labels: Record<string, string> = {
 			'EN': 'English',
 			'IT': 'Italian',
 			'ES': 'Spanish',
@@ -49,7 +46,7 @@
 	}
 	
 	function getProviderLabel(provider: string): string {
-		const labels = {
+		const labels: Record<string, string> = {
 			'SKILLA': 'Skilla',
 			'LINKEDIN': 'LinkedIn',
 			'PACK': 'Pack',
@@ -60,7 +57,7 @@
 	}
 	
 	function getRoleLabels(roles: string[]): string {
-		const labels = {
+		const labels: Record<string, string> = {
 			'MENTOR': 'Mentor',
 			'COACH': 'Coach',
 			'MENTEE': 'Mentee',
@@ -91,7 +88,7 @@
 			});
 			
 			if (response.ok) {
-				dispatch('refresh');
+				onRefresh?.();
 			} else {
 				alert('Failed to delete file');
 			}
@@ -245,6 +242,7 @@
 		word-wrap: break-word;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}

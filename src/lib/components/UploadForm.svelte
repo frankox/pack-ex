@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	
-	const dispatch = createEventDispatcher();
+	export let onSuccess: (() => void) | undefined = undefined;
 	
 	let formData = {
 		title: '',
@@ -96,7 +94,7 @@
 				};
 				fileInput.value = '';
 				
-				dispatch('success');
+				onSuccess?.();
 			} else {
 				const error = await response.text();
 				alert('Upload failed: ' + error);
@@ -172,19 +170,21 @@
 	</div>
 	
 	<div class="form-group">
-		<label>Roles *</label>
-		<div class="checkbox-group">
-			{#each roles as role}
-				<label class="checkbox-label">
-					<input
-						type="checkbox"
-						value={role.value}
-						on:change={(e) => handleRoleChange(role.value, e.target?.checked)}
-					/>
-					{role.label}
-				</label>
-			{/each}
-		</div>
+		<fieldset>
+			<legend>Roles *</legend>
+			<div class="checkbox-group">
+				{#each roles as role}
+					<label class="checkbox-label">
+						<input
+							type="checkbox"
+							value={role.value}
+							on:change={(e) => handleRoleChange(role.value, (e.target as HTMLInputElement)?.checked)}
+						/>
+						{role.label}
+					</label>
+				{/each}
+			</div>
+		</fieldset>
 	</div>
 	
 	<div class="form-group">
@@ -270,6 +270,20 @@
 		font-size: 12px;
 		color: #7f8c8d;
 		margin-top: 4px;
+	}
+	
+	fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+	}
+	
+	legend {
+		display: block;
+		margin-bottom: 8px;
+		font-weight: 600;
+		color: #2c3e50;
+		padding: 0;
 	}
 	
 	.checkbox-group {

@@ -39,13 +39,13 @@
 	
 	{#if showUpload}
 		<div class="upload-section">
-			<UploadForm on:success={handleUploadSuccess} />
+			<UploadForm onSuccess={handleUploadSuccess} />
 		</div>
 	{/if}
 	
 	<div class="table-section">
 		<h2>Uploaded Files ({files.length})</h2>
-		<FileTable {files} on:refresh={loadFiles} />
+		<FileTable {files} onRefresh={loadFiles} />
 	</div>
 </div>
 

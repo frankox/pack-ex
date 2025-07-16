@@ -1,5 +1,4 @@
 import { error } from '@sveltejs/kit';
-import { prisma } from '$lib/db';
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import type { RequestEvent } from '@sveltejs/kit';
