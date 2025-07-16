@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: packex_postgres
+    environment:
+      POSTGRES_USER: packex_user
+      POSTGRES_PASSWORD: packex_password
+      POSTGRES_DB: packex_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: packex_app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://packex_user:packex_password@db:5432/packex_db?schema=public"
+      UPLOAD_DIR: "/app/uploads"
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

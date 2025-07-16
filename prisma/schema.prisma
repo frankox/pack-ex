@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UploadedFile {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(200)
+  description String   @db.VarChar(1000)
+  category    Category
+  language    Language
+  provider    Provider
+  roles       Role[]
+  fileName    String
+  filePath    String
+  fileSize    Int
+  mimeType    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("uploaded_files")
+}
+
+enum Category {
+  LEADERSHIP
+  MANAGING_COMPLEXITY
+  INNOVATION
+  STRATEGY
+  COMMUNICATION
+  TEAMWORK
+  PROBLEM_SOLVING
+  TECHNICAL_SKILLS
+}
+
+enum Language {
+  EN
+  IT
+  ES
+  FR
+  DE
+}
+
+enum Provider {
+  SKILLA
+  LINKEDIN
+  PACK
+  MENTOR
+  EXTERNAL
+}
+
+enum Role {
+  MENTOR
+  COACH
+  MENTEE
+  COACHEE
+}
