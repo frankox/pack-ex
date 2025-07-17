@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
+import { prisma } from '$lib/db';
 import type { RequestEvent } from '@sveltejs/kit';
 
 export const GET = async ({ params }: RequestEvent) => {
