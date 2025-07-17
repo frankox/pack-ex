@@ -12,6 +12,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "postinstall": "prisma generate",
     "configure-storage": "node configure-storage.js"
   },
   "devDependencies": {
@@ -26,6 +28,7 @@
     "@aws-sdk/client-s3": "^3.846.0",
     "@aws-sdk/s3-request-presigner": "^3.846.0",
     "@prisma/client": "^6.12.0",
+    "@sveltejs/adapter-auto": "^6.0.1",
     "@sveltejs/adapter-node": "^5.2.13",
     "@sveltejs/kit": "^2.24.0",
     "@types/express": "^5.0.3",

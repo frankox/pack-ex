@@ -163,7 +163,34 @@ pack-ex/
 └── README.md
 ```
 
-## Environment Variables
+## Environment Configuration
+
+PackEx provides multiple environment configuration files for different deployment scenarios:
+
+### Environment Files
+
+| File | Purpose | Usage |
+|------|---------|-------|
+| `.env` | Default configuration | Development fallback |
+| `.env.local` | Local development | Docker development environment |
+| `.env.production` | Production deployment | Google Drive storage configuration |
+| `.env.example` | Template file | Shows all available options |
+
+### Setup Instructions
+
+1. **For Local Development with Docker**:
+   ```bash
+   cp .env.local .env
+   # Edit .env if needed, then start development
+   make dev
+   ```
+
+2. **For Production with Google Drive**:
+   ```bash
+   cp .env.production .env
+   # Configure Google Drive credentials (see CLOUD_STORAGE.md)
+   # Deploy to your production environment
+   ```
 
 ### Storage Configuration
 

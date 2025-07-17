@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm run vercel-build",
+  "framework": "sveltekit",
+  "installCommand": "npm install",
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "STORAGE_PROVIDER": "GOOGLE_DRIVE",
+    "GOOGLE_DRIVE_CLIENT_ID": "@google_drive_client_id",
+    "GOOGLE_DRIVE_CLIENT_SECRET": "@google_drive_client_secret",
+    "GOOGLE_DRIVE_REDIRECT_URI": "@google_drive_redirect_uri",
+    "GOOGLE_DRIVE_REFRESH_TOKEN": "@google_drive_refresh_token",
+    "GOOGLE_DRIVE_FOLDER_ID": "@google_drive_folder_id",
+    "MAX_FILE_SIZE": "10485760",
+    "NODE_ENV": "production",
+    "SESSION_SECRET": "@session_secret"
+  },
+  "functions": {
+    "src/routes/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  }
+}

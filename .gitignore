@@ -26,5 +26,8 @@ dist-ssr
 # PackEx specific
 uploads/
 .env
+.env.local
+.env.production
+.env.*.local
 build/
 .svelte-kit/
