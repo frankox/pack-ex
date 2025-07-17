@@ -1,6 +1,8 @@
 version: '3.8'
 
 services:
+  # Optional: Local PostgreSQL for development
+  # You can also use Neon PostgreSQL directly
   db:
     image: postgres:15
     container_name: packex_postgres
@@ -14,29 +16,22 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  # PackEx application with UploadThing
   app:
     build: .
     container_name: packex_app
     ports:
       - "3000:3000"
     environment:
+      # Use local database (comment out to use Neon)
       DATABASE_URL: "postgresql://packex_user:packex_password@db:5432/packex_db?schema=public"
-      STORAGE_PROVIDER: "LOCAL"
-      UPLOAD_DIR: "/app/uploads"
-      MAX_FILE_SIZE: "10485760"
-      # AWS S3 Configuration (uncomment and configure when using AWS_S3)
-      # AWS_REGION: "us-east-1"
-      # AWS_S3_BUCKET: "your-bucket-name"
-      # AWS_ACCESS_KEY_ID: "your-access-key"
-      # AWS_SECRET_ACCESS_KEY: "your-secret-key"
-      # Google Drive Configuration (uncomment and configure when using GOOGLE_DRIVE)
-      # GOOGLE_DRIVE_CLIENT_ID: "your-client-id"
-      # GOOGLE_DRIVE_CLIENT_SECRET: "your-client-secret"
-      # GOOGLE_DRIVE_REDIRECT_URI: "http://localhost:3000/auth/google/callback"
-      # GOOGLE_DRIVE_REFRESH_TOKEN: "your-refresh-token"
-      # GOOGLE_DRIVE_FOLDER_ID: "your-folder-id"
-    volumes:
-      - ./uploads:/app/uploads
+      
+      # UploadThing Configuration
+      UPLOADTHING_TOKEN: "${UPLOADTHING_TOKEN}"
+      
+      # Application Settings
+      NODE_ENV: "production"
+      SESSION_SECRET: "${SESSION_SECRET}"
     depends_on:
       - db
     restart: unless-stopped

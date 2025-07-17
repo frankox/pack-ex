@@ -1,24 +1,23 @@
 # PackEx - File Upload Manager
 
-A modern file upload and management application built with SvelteKit, TypeScript, PostgreSQL, and Docker. Supports multiple storage providers including local storage, AWS S3, and Google Drive.
+A modern file upload and management application built with SvelteKit, TypeScript, PostgreSQL, and UploadThing. Simple, fast, and reliable file uploads with global CDN delivery.
 
 ## Features
 
-- **File Upload**: Upload various file types (PDF, TXT, DOC, DOCX, PPT, PPTX, MP4, MOV, AVI)
-- **Multiple Storage Providers**: Choose between local storage, AWS S3, or Google Drive
+- **File Upload**: Upload various file types (PDF, TXT, DOC, DOCX, PPT, PPTX, MP4, MOV, AVI, ZIP, Images)
+- **UploadThing Integration**: Modern file upload service with built-in CDN
 - **Metadata Management**: Capture title, description, category, language, provider, and roles
 - **File Table**: Display uploaded files with sorting and search capabilities
-- **File Download**: Click any row to download the file
+- **Fast Downloads**: Direct CDN links for optimal performance
 - **Responsive Design**: Works on desktop and mobile devices
 - **Docker Support**: Easy deployment with Docker and docker-compose
-- **Configurable Storage**: Switch between storage providers via configuration
 
 ## Tech Stack
 
 - **Frontend**: SvelteKit with TypeScript
 - **Backend**: SvelteKit API routes
 - **Database**: PostgreSQL with Prisma ORM
-- **File Storage**: Local filesystem, AWS S3, or Google Drive
+- **File Storage**: UploadThing (global CDN)
 - **Containerization**: Docker & Docker Compose
 
 ## Quick Start
@@ -26,10 +25,12 @@ A modern file upload and management application built with SvelteKit, TypeScript
 ### Prerequisites
 
 - Node.js 20.19+
-- Docker Desktop (for database)
-- Make (for using Makefile commands)
+- Docker Desktop (optional - for local database)
+- Make (optional - for using Makefile commands)
 
 ### Setup Instructions
+
+#### Option 1: With Docker (Local Database)
 
 1. **Clone the repository**:
    ```bash
@@ -42,9 +43,10 @@ A modern file upload and management application built with SvelteKit, TypeScript
    make setup
    ```
 
-3. **Configure storage provider** (optional - defaults to local storage):
+3. **Configure environment** (set your UploadThing token):
    ```bash
-   npm run configure-storage
+   cp .env.example .env
+   # Edit .env and add your UPLOADTHING_TOKEN
    ```
 
 4. **Start development** (starts database and dev server):
@@ -52,11 +54,40 @@ A modern file upload and management application built with SvelteKit, TypeScript
    make dev
    ```
 
-5. **Access the application**:
-   - App: http://localhost:5173
-   - Database: localhost:5432
+#### Option 2: Without Docker (Cloud Database)
 
-### Available Commands
+1. **Clone the repository**:
+   ```bash
+   git clone <your-repo>
+   cd pack-ex
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment**:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your DATABASE_URL and UPLOADTHING_TOKEN
+   ```
+
+4. **Set up database schema**:
+   ```bash
+   npm run db:push
+   ```
+
+5. **Start development server**:
+   ```bash
+   npm run dev
+   ```
+
+### Access the application
+- **App**: http://localhost:5173
+- **Database** (if using Docker): localhost:5432
+
+### Available Commands (Docker Setup)
 
 | Command | Description |
 |---------|-------------|

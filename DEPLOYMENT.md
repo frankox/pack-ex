@@ -1,6 +1,6 @@
 # PackEx Deployment Guide
 
-This guide will help you deploy your PackEx application with Neon PostgreSQL and Google Drive storage using service account authentication.
+This guide will help you deploy your PackEx application with Neon PostgreSQL and UploadThing for file storage.
 
 ## Database Configuration
 
@@ -9,15 +9,12 @@ Your application is already configured to use Neon PostgreSQL with the connectio
 postgresql://neondb_owner:npg_o4eBfnasCY7u@ep-bitter-cloud-ab0tp6dh-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 ```
 
-## Prerequisites for Google Drive Storage
+## UploadThing Setup
 
-1. **Google Cloud Console Setup**:
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project or select existing one
-   - Enable the Google Drive API
-   - Create a Service Account (IAM & Admin > Service Accounts)
-   - Generate and download a JSON key file for the service account
-   - Share your target Google Drive folder with the service account email address
+UploadThing is already configured for your PackEx application:
+- **App ID**: `n3z70eo3f5`
+- **Region**: `sea1`
+- **API Token**: Already provided
 
 ## Environment Variables
 
@@ -27,43 +24,21 @@ When deploying, ensure these environment variables are set:
 # Database
 DATABASE_URL=postgresql://neondb_owner:npg_o4eBfnasCY7u@ep-bitter-cloud-ab0tp6dh-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
-# Storage Configuration
-STORAGE_PROVIDER=GOOGLE_DRIVE
-
-# Google Drive Service Account (paste the entire JSON key file content)
-GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY='{"type":"service_account","project_id":"your-project",...}'
-
-# Google Drive Folder ID (optional - if not provided, files will be stored in root)
-GOOGLE_DRIVE_FOLDER_ID=your-google-drive-folder-id
+# UploadThing Configuration
+UPLOADTHING_TOKEN='asdasdasd'
 
 # Application Settings
-MAX_FILE_SIZE=10485760
 NODE_ENV=production
 SESSION_SECRET=your-strong-random-secret-key
 ```
 
-## Setting up Google Drive Service Account
+## UploadThing Benefits
 
-1. **Create Service Account**:
-   - Go to Google Cloud Console → IAM & Admin → Service Accounts
-   - Click "Create Service Account"
-   - Give it a name like "packex-drive-service"
-   - Skip role assignment (not needed)
-   - Click "Done"
-
-2. **Generate Key**:
-   - Click on the created service account
-   - Go to "Keys" tab
-   - Click "Add Key" → "Create new key"
-   - Choose "JSON" format
-   - Download the JSON file
-
-3. **Share Drive Folder**:
-   - Create a folder in Google Drive for your files
-   - Right-click the folder → "Share"
-   - Add the service account email (found in the JSON file as `client_email`)
-   - Give it "Editor" permissions
-   - Copy the folder ID from the URL (the long string after `/folders/`)
+- **No Setup Required**: Your UploadThing app is already configured
+- **Global CDN**: Files are delivered via fast global CDN
+- **Automatic Scaling**: Handles any file volume without infrastructure
+- **Built-in Security**: Secure file uploads and access controls
+- **No Storage Costs**: UploadThing handles all file storage and delivery
 
 ## Pre-deployment Steps
 
@@ -85,8 +60,8 @@ npm run build
 
 2. **Configure Environment Variables**:
    - In your deployment platform settings, add all the environment variables listed above
-   - Make sure to paste the entire JSON service account key as the `GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY` value
-   - Use the exact variable names
+   - Make sure to use the exact variable names and values
+   - The UploadThing token is already provided and configured
 
 3. **Build Settings** (for most platforms):
    - Build Command: `npm run build`
@@ -97,17 +72,16 @@ npm run build
 
 ## Important Notes
 
-- **Authentication**: Using Service Account authentication (simpler and more secure for server-side apps)
+- **File Storage**: UploadThing handles all file storage and CDN delivery
 - **Adapter**: Using `@sveltejs/adapter-auto` which automatically detects the deployment platform
 - **Database**: Neon database is already configured and ready to use
-- **File Storage**: Files will be stored in Google Drive using service account permissions
-- **Permissions**: The service account must have access to the target Google Drive folder
+- **No Additional Setup**: UploadThing is pre-configured with your API token
 
 ## Post-deployment Verification
 
 1. Check that your deployment completed successfully
 2. Test file upload functionality  
-3. Verify files are being stored in Google Drive
+3. Verify files are accessible via UploadThing CDN
 4. Check database connection and data persistence
 
 ## Troubleshooting
@@ -118,11 +92,10 @@ npm run build
    - Verify the DATABASE_URL is correctly set
    - Check that Neon database allows connections
 
-2. **Google Drive API Issues**
-   - Ensure the service account JSON key is properly formatted
-   - Verify the service account has access to the target folder
-   - Check that the Google Drive API is enabled in your project
-   - Ensure the folder ID is correct
+2. **UploadThing Issues**
+   - Ensure the UPLOADTHING_TOKEN is correctly set
+   - Check UploadThing dashboard for upload logs
+   - Verify file size limits are within UploadThing constraints
 
 3. **Build Failures**
    - Check build logs for specific errors
@@ -130,29 +103,36 @@ npm run build
    - Verify Prisma schema matches the database
 
 4. **File Upload Issues**
-   - Check Google Drive API quotas and limits
-   - Verify service account permissions on the folder
-   - Check file size limits (currently set to 10MB)
-   - Ensure the service account JSON is valid and properly escaped in environment variables
+   - Check UploadThing dashboard for error logs
+   - Verify file types are supported by your configuration
+   - Ensure network connectivity to UploadThing servers
 
-## Service Account vs OAuth2
+## UploadThing vs Traditional Storage
 
-**Why Service Account is better for your use case:**
-- ✅ No user interaction required
-- ✅ More secure for server-side applications
-- ✅ No token refresh needed
-- ✅ Simpler to configure and deploy
-- ✅ Better for automated processes
-
-The service account will have its own Google Drive space, or you can share specific folders with it.
+**Why UploadThing is better:**
+- ✅ No infrastructure setup required
+- ✅ Global CDN for fast file delivery
+- ✅ Automatic scaling and optimization
+- ✅ Built-in security and access controls
+- ✅ No storage or bandwidth costs
+- ✅ Simple integration with one API token
+- ✅ Automatic file processing and optimization
 
 ## Environment Variables Reference
 
 | Variable | Description | Required | Example |
 |----------|-------------|----------|---------|
 | DATABASE_URL | Neon PostgreSQL connection string | Yes | postgresql://... |
-| STORAGE_PROVIDER | Storage provider type | Yes | GOOGLE_DRIVE |
-| GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY | Service account JSON key | Yes | {"type":"service_account",...} |
-| GOOGLE_DRIVE_FOLDER_ID | Target folder ID in Drive | No | 1BxxxxxxxxxxxxxB |
-| MAX_FILE_SIZE | Maximum file size in bytes | No | 10485760 |
+| UPLOADTHING_TOKEN | UploadThing API token | Yes | eyJhcGlLZXk... |
 | SESSION_SECRET | Secret for session encryption | Yes | random-secret-key |
+| NODE_ENV | Environment mode | No | production |
+
+## File Upload Limits
+
+UploadThing provides generous limits:
+- **Documents**: PDF, Word, Excel, PowerPoint (up to 16MB)
+- **Images**: JPG, PNG, etc. (up to 8MB)
+- **Videos**: MP4, MOV, AVI (up to 128MB)  
+- **Audio**: Various formats (up to 32MB)
+- **Archives**: ZIP files (up to 64MB)
+- **Other**: Generic files (up to 64MB)

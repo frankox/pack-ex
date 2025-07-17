@@ -1,14 +1,6 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/db';
 import type { RequestEvent } from '@sveltejs/kit';
-import { StorageFactory, type StorageProviderType } from '$lib/storage/index.js';
-import dotenv from 'dotenv';
-
-// Load environment variables
-dotenv.config();
-
-const STORAGE_PROVIDER = (process.env.STORAGE_PROVIDER as StorageProviderType) || 'LOCAL';
-const storageProvider = StorageFactory.createProvider(STORAGE_PROVIDER, process.env as Record<string, string>);
 
 export const GET = async ({ params }: RequestEvent) => {
 	try {
@@ -26,17 +18,15 @@ export const GET = async ({ params }: RequestEvent) => {
 			throw error(404, 'File not found');
 		}
 		
-		// Download file using storage provider
-		const fileBuffer = await storageProvider.downloadFile(file.filePath);
+		// With UploadThing, filePath contains the direct URL
+		// So we can simply redirect to it
+		throw redirect(302, file.filePath);
 		
-		return new Response(fileBuffer, {
-			headers: {
-				'Content-Type': file.mimeType,
-				'Content-Disposition': `attachment; filename="${file.fileName}"`,
-				'Content-Length': file.fileSize.toString()
-			}
-		});
 	} catch (err) {
+		if (err?.status) {
+			// Re-throw SvelteKit errors (like redirect)
+			throw err;
+		}
 		console.error('Error downloading file:', err);
 		throw error(500, 'Failed to download file');
 	}

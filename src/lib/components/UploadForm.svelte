@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { createUploadThing } from "$lib/utils/uploadthing";
+	
 	export let onSuccess: (() => void) | undefined = undefined;
 	
 	let formData = {
@@ -12,7 +14,23 @@
 	
 	let fileInput: HTMLInputElement;
 	let isUploading = false;
-	let uploadProgress = 0;
+	let selectedFile: File | null = null;
+
+	// Create UploadThing uploader
+	const { startUpload } = createUploadThing("fileUploader", {
+		onClientUploadComplete: (res) => {
+			console.log("Upload Completed", res);
+			handleUploadSuccess(res[0]);
+		},
+		onUploadError: (error: Error) => {
+			console.error("Upload Error:", error);
+			alert(`Upload failed: ${error.message}`);
+			isUploading = false;
+		},
+		onUploadBegin: (name) => {
+			console.log("Upload began for", name);
+		},
+	});
 	
 	const categories = [
 		{ value: 'LEADERSHIP', label: 'Leadership' },
@@ -48,33 +66,30 @@
 		{ value: 'COACHEE', label: 'Coachee' }
 	];
 	
-	async function handleSubmit() {
-		if (!fileInput.files || fileInput.files.length === 0) {
-			alert('Please select a file to upload');
-			return;
-		}
-		
-		isUploading = true;
-		uploadProgress = 0;
-		
-		const file = fileInput.files[0];
-		const formDataToSend = new FormData();
-		
-		formDataToSend.append('file', file);
-		formDataToSend.append('title', formData.title);
-		formDataToSend.append('description', formData.description);
-		formDataToSend.append('category', formData.category);
-		formDataToSend.append('language', formData.language);
-		formDataToSend.append('provider', formData.provider);
-		formDataToSend.append('roles', JSON.stringify(formData.roles));
-		
+	async function handleUploadSuccess(uploadedFile: any) {
 		try {
-			const response = await fetch('/api/upload', {
+			// Save file metadata to database
+			const response = await fetch('/api/files', {
 				method: 'POST',
-				body: formDataToSend
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					title: formData.title.trim(),
+					description: formData.description.trim(),
+					category: formData.category,
+					language: formData.language,
+					provider: formData.provider,
+					roles: formData.roles,
+					fileName: uploadedFile.name,
+					filePath: uploadedFile.url, // UploadThing URL
+					fileSize: uploadedFile.size,
+					mimeType: uploadedFile.type || 'application/octet-stream'
+				})
 			});
-			
+
 			if (response.ok) {
+				// Reset form
 				formData = {
 					title: '',
 					description: '',
@@ -84,18 +99,49 @@
 					roles: []
 				};
 				fileInput.value = '';
+				selectedFile = null;
 				
 				onSuccess?.();
 			} else {
 				const error = await response.text();
-				alert('Upload failed: ' + error);
+				alert('Failed to save file metadata: ' + error);
 			}
 		} catch (error) {
-			alert('Upload failed: ' + error);
+			console.error('Error saving file metadata:', error);
+			alert('Failed to save file metadata: ' + error);
 		} finally {
 			isUploading = false;
-			uploadProgress = 0;
 		}
+	}
+
+	async function handleSubmit() {
+		if (!selectedFile) {
+			alert('Please select a file to upload');
+			return;
+		}
+
+		// Validate required fields
+		if (!formData.title || !formData.description || !formData.category || 
+			!formData.language || !formData.provider || formData.roles.length === 0) {
+			alert('Please fill in all required fields');
+			return;
+		}
+		
+		isUploading = true;
+		
+		try {
+			// Start UploadThing upload
+			await startUpload([selectedFile]);
+		} catch (error) {
+			console.error('Upload failed:', error);
+			alert('Upload failed: ' + error);
+			isUploading = false;
+		}
+	}
+
+	function handleFileSelect(event: Event) {
+		const target = event.target as HTMLInputElement;
+		selectedFile = target.files?.[0] || null;
 	}
 </script>
 
@@ -175,6 +221,7 @@
 			id="file"
 			type="file"
 			bind:this={fileInput}
+			on:change={handleFileSelect}
 			accept=".pdf,.txt,.doc,.docx,.ppt,.pptx,.mp4,.mov,.avi,.zip,.rar,.jpg,.jpeg,.png"
 			required
 		/>
@@ -184,9 +231,9 @@
 	{#if isUploading}
 		<div class="upload-progress">
 			<div class="progress-bar">
-				<div class="progress-fill" style="width: {uploadProgress}%"></div>
+				<div class="progress-fill" style="width: 100%"></div>
 			</div>
-			<span>Uploading...</span>
+			<span>Uploading to UploadThing...</span>
 		</div>
 	{/if}
 	
