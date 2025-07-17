@@ -108,7 +108,6 @@
 </script>
 
 <form on:submit|preventDefault={handleSubmit} class="upload-form">
-	<h3>Upload New File</h3>
 	
 	<div class="form-grid">
 		<div class="form-group">
@@ -192,10 +191,10 @@
 			id="file"
 			type="file"
 			bind:this={fileInput}
-			accept=".pdf,.txt,.doc,.docx,.ppt,.pptx,.mp4,.mov,.avi"
+			accept=".pdf,.txt,.doc,.docx,.ppt,.pptx,.mp4,.mov,.avi,.zip,.rar,.jpg,.jpeg,.png"
 			required
 		/>
-		<small class="file-help">Supported formats: PDF, TXT, DOC, DOCX, PPT, PPTX, MP4, MOV, AVI</small>
+		<small class="file-help">Supported formats: PDF, TXT, DOC, DOCX, PPT, PPTX, MP4, MOV, AVI, ZIP, RAR, JPG, JPEG, PNG</small>
 	</div>
 	
 	{#if isUploading}
@@ -217,13 +216,6 @@
 <style>
 	.upload-form {
 		max-width: 800px;
-	}
-	
-	.upload-form h3 {
-		color: #2c3e50;
-		margin-bottom: 30px;
-		font-size: 24px;
-		font-weight: 600;
 	}
 	
 	.form-grid {
@@ -249,7 +241,7 @@
 	.form-group textarea {
 		width: 100%;
 		padding: 12px;
-		border: 2px solid #e1e8ed;
+		border: 2px solid #c7d7e3;
 		border-radius: 8px;
 		font-size: 16px;
 		transition: border-color 0.3s, box-shadow 0.3s;

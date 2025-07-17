@@ -2,9 +2,10 @@
 	import { onMount } from 'svelte';
 	import UploadForm from '$lib/components/UploadForm.svelte';
 	import FileTable from '$lib/components/FileTable.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	
 	let files: any[] = [];
-	let showUpload = false;
+	let showUploadModal = false;
 	
 	async function loadFiles() {
 		try {
@@ -16,7 +17,7 @@
 	}
 	
 	function handleUploadSuccess() {
-		showUpload = false;
+		showUploadModal = false;
 		loadFiles();
 	}
 	
@@ -31,17 +32,19 @@
 	<div class="action-bar">
 		<button 
 			class="upload-btn" 
-			on:click={() => showUpload = !showUpload}
+			on:click={() => showUploadModal = true}
 		>
-			{showUpload ? 'Cancel' : '+ Upload New File'}
+			+ Upload New File
 		</button>
 	</div>
 	
-	{#if showUpload}
-		<div class="upload-section">
-			<UploadForm onSuccess={handleUploadSuccess} />
-		</div>
-	{/if}
+	<Modal 
+		isOpen={showUploadModal} 
+		title="Upload New File"
+		onClose={() => showUploadModal = false}
+	>
+		<UploadForm onSuccess={handleUploadSuccess} />
+	</Modal>
 	
 	<div class="table-section">
 		<h2>Uploaded Files ({files.length})</h2>
@@ -77,15 +80,6 @@
 	.upload-btn:hover {
 		transform: translateY(-2px);
 		box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-	}
-	
-	.upload-section {
-		background: white;
-		border-radius: 12px;
-		padding: 30px;
-		margin-bottom: 30px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-		border: 1px solid #e1e8ed;
 	}
 	
 	.table-section h2 {
