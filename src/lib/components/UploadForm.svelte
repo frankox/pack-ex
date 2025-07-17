@@ -83,7 +83,6 @@
 			});
 			
 			if (response.ok) {
-				// Reset form
 				formData = {
 					title: '',
 					description: '',

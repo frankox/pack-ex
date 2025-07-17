@@ -68,7 +68,6 @@
 	
 	async function handleRowClick(file: any) {
 		try {
-			// Open file in new tab
 			window.open(`/api/files/${file.id}/download`, '_blank');
 		} catch (error) {
 			console.error('Error opening file:', error);
