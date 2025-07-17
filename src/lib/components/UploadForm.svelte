@@ -48,14 +48,6 @@
 		{ value: 'COACHEE', label: 'Coachee' }
 	];
 	
-	function handleRoleChange(roleValue: string, checked: boolean) {
-		if (checked) {
-			formData.roles = [...formData.roles, roleValue];
-		} else {
-			formData.roles = formData.roles.filter(role => role !== roleValue);
-		}
-	}
-	
 	async function handleSubmit() {
 		if (!fileInput.files || fileInput.files.length === 0) {
 			alert('Please select a file to upload');
@@ -168,21 +160,13 @@
 	</div>
 	
 	<div class="form-group">
-		<fieldset>
-			<legend>Roles *</legend>
-			<div class="checkbox-group">
-				{#each roles as role}
-					<label class="checkbox-label">
-						<input
-							type="checkbox"
-							value={role.value}
-							on:change={(e) => handleRoleChange(role.value, (e.target as HTMLInputElement)?.checked)}
-						/>
-						{role.label}
-					</label>
-				{/each}
-			</div>
-		</fieldset>
+		<label for="roles">Roles *</label>
+		<select id="roles" bind:value={formData.roles} multiple required>
+			{#each roles as role}
+				<option value={role.value}>{role.label}</option>
+			{/each}
+		</select>
+		<small class="multiselect-help">Hold Ctrl (Cmd on Mac) to select multiple roles</small>
 	</div>
 	
 	<div class="form-group">
@@ -275,54 +259,29 @@
 		font-weight: 500;
 	}
 	
-	fieldset {
-		border: none;
-		padding: 0;
-		margin: 0;
+	select[multiple] {
+		min-height: 120px;
+		padding: 12px;
 	}
 	
-	legend {
-		display: block;
-		margin-bottom: 12px;
-		font-weight: 600;
-		color: var(--text-primary);
-		padding: 0;
-		font-size: 14px;
-		letter-spacing: 0.025em;
-	}
-	
-	.checkbox-group {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-		gap: 16px;
-		padding: 16px;
-		background: var(--background-light);
-		border-radius: 12px;
-		border: 2px solid var(--border-light);
-	}
-	
-	.checkbox-label {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		font-weight: 500;
-		cursor: pointer;
-		color: var(--text-primary);
-		transition: all 0.2s ease;
+	select[multiple] option {
 		padding: 8px 12px;
-		border-radius: 8px;
+		margin: 2px 0;
+		border-radius: 6px;
 	}
 	
-	.checkbox-label:hover {
-		background: var(--background-white);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	select[multiple] option:checked {
+		background: var(--primary-orange);
+		color: white;
 	}
 	
-	.checkbox-label input[type="checkbox"] {
-		width: 18px;
-		height: 18px;
-		margin: 0;
-		accent-color: var(--primary-orange);
+	.multiselect-help {
+		display: block;
+		margin-top: 6px;
+		font-size: 12px;
+		color: var(--text-secondary);
+		line-height: 1.4;
+		font-weight: 500;
 	}
 	
 	.file-help {
@@ -406,10 +365,6 @@
 		.form-grid {
 			grid-template-columns: 1fr;
 			gap: 20px;
-		}
-		
-		.checkbox-group {
-			grid-template-columns: 1fr;
 		}
 	}
 </style>
