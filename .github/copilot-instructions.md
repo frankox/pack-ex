@@ -32,3 +32,4 @@ The main entity is `UploadedFile` with:
 - Ensure proper error handling and validation
 - Maintain responsive design principles
 - Use Prisma for all database operations
+- Keep updated the readme and copilot-instructions if necessary

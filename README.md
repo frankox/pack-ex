@@ -23,63 +23,67 @@ A modern file upload and management application built with SvelteKit, TypeScript
 
 ### Prerequisites
 
-- Node.js 20.19+ or Docker
-- PostgreSQL (or use Docker)
+- Node.js 20.19+
+- Docker Desktop (for database)
+- Make (for using Makefile commands)
 
-### Option 1: Docker (Recommended)
+### Setup Instructions
 
-1. **Clone and start**:
+1. **Clone the repository**:
    ```bash
    git clone <your-repo>
    cd pack-ex
-   docker-compose up -d
    ```
 
-2. **Run database migrations**:
+2. **First-time setup** (installs dependencies and sets up database):
    ```bash
-   docker-compose exec app npx prisma migrate dev
+   make setup
    ```
 
-3. **Access the application**:
-   - App: http://localhost:3000
+3. **Start development** (starts database and dev server):
+   ```bash
+   make dev
+   ```
+
+4. **Access the application**:
+   - App: http://localhost:5173
    - Database: localhost:5432
 
-### Option 2: Local Development
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `make help` | Show all available commands |
+| `make setup` | Initial project setup (first-time only) |
+| `make dev` | Start development environment |
+| `make start-docker` | Start only the database container |
+| `make stop-docker` | Stop Docker services |
+| `make clean` | Clean up Docker containers and volumes |
+
+### Alternative Setup (Manual)
+
+If you prefer not to use Make:
 
 1. **Install dependencies**:
    ```bash
    npm install --registry https://registry.npmjs.org/
    ```
 
-2. **Set up environment**:
+2. **Start database**:
    ```bash
-   cp .env.example .env
-   # Edit .env with your database credentials
+   docker-compose up -d db
    ```
 
-3. **Start PostgreSQL** (if not using Docker):
+3. **Set up database**:
    ```bash
-   # Using Docker for database only
-   docker run -d --name postgres \
-     -e POSTGRES_USER=packex_user \
-     -e POSTGRES_PASSWORD=packex_password \
-     -e POSTGRES_DB=packex_db \
-     -p 5432:5432 postgres:15
+   npm run db:generate
+   npm run db:migrate
    ```
 
-4. **Set up database**:
-   ```bash
-   npx prisma generate
-   npx prisma migrate dev
-   ```
-
-5. **Start development server**:
+4. **Start development server**:
    ```bash
    npm run dev
    ```
-
-6. **Access the application**:
-   - App: http://localhost:5173
 
 ## API Endpoints
 
