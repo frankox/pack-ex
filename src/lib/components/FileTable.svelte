@@ -160,27 +160,38 @@
 
 <style>
 	.table-container {
-		background: white;
-		border-radius: 12px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-		border: 1px solid #e1e8ed;
+		background: var(--background-white);
+		border-radius: 16px;
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+		border: 1px solid var(--border-light);
 		overflow: hidden;
+		margin: 32px auto;
+		max-width: 1200px;
 	}
 	
 	.empty-state {
 		text-align: center;
-		padding: 60px 20px;
-		color: #7f8c8d;
+		padding: 80px 20px;
+		color: var(--text-secondary);
 	}
 	
 	.empty-icon {
 		font-size: 4rem;
-		margin-bottom: 20px;
+		margin-bottom: 24px;
+		opacity: 0.6;
 	}
 	
 	.empty-state h3 {
-		margin: 0 0 10px 0;
-		color: #2c3e50;
+		margin: 0 0 12px 0;
+		color: var(--text-primary);
+		font-size: 1.5rem;
+		font-weight: 600;
+	}
+	
+	.empty-state p {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 500;
 	}
 	
 	.table-wrapper {
@@ -194,32 +205,37 @@
 	}
 	
 	.files-table th {
-		background: #f8f9fa;
-		padding: 16px 12px;
+		background: linear-gradient(135deg, var(--background-light) 0%, #f1f5f9 100%);
+		padding: 20px 16px;
 		text-align: left;
 		font-weight: 600;
-		color: #2c3e50;
-		border-bottom: 2px solid #e1e8ed;
+		color: var(--text-primary);
+		border-bottom: 2px solid var(--border-light);
 		white-space: nowrap;
+		font-size: 13px;
+		letter-spacing: 0.025em;
+		text-transform: uppercase;
 	}
 	
 	.files-table td {
-		padding: 16px 12px;
-		border-bottom: 1px solid #e1e8ed;
+		padding: 20px 16px;
+		border-bottom: 1px solid var(--border-light);
 		vertical-align: top;
 	}
 	
 	.file-row {
 		cursor: pointer;
-		transition: background-color 0.2s;
+		transition: all 0.3s ease;
 	}
 	
 	.file-row:hover {
-		background-color: #f8f9fa;
+		background: linear-gradient(135deg, #fffbf7 0%, var(--background-light) 100%);
+		transform: translateX(2px);
+		box-shadow: 0 4px 12px rgba(234, 88, 12, 0.08);
 	}
 	
 	.title-cell {
-		max-width: 300px;
+		max-width: 350px;
 	}
 	
 	.file-info {
@@ -228,15 +244,17 @@
 	
 	.file-title {
 		font-weight: 600;
-		color: #2c3e50;
-		margin-bottom: 4px;
+		color: var(--text-primary);
+		margin-bottom: 6px;
 		word-wrap: break-word;
+		font-size: 15px;
+		line-height: 1.4;
 	}
 	
 	.file-description {
-		color: #7f8c8d;
-		font-size: 12px;
-		margin-bottom: 4px;
+		color: var(--text-secondary);
+		font-size: 13px;
+		margin-bottom: 6px;
 		line-height: 1.4;
 		word-wrap: break-word;
 		display: -webkit-box;
@@ -247,35 +265,45 @@
 	}
 	
 	.file-name {
-		color: #667eea;
+		color: var(--primary-orange);
 		font-size: 12px;
-		font-family: monospace;
+		font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
 		word-wrap: break-word;
+		font-weight: 500;
+		background: #fffbf7;
+		padding: 2px 6px;
+		border-radius: 4px;
+		display: inline-block;
 	}
 	
 	.category-badge {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
 		color: white;
-		padding: 4px 8px;
-		border-radius: 12px;
+		padding: 6px 12px;
+		border-radius: 20px;
 		font-size: 11px;
-		font-weight: 500;
+		font-weight: 600;
 		white-space: nowrap;
+		letter-spacing: 0.025em;
+		box-shadow: 0 2px 4px rgba(234, 88, 12, 0.2);
 	}
 	
 	.provider-badge {
-		background: #e8f4f8;
-		color: #2c3e50;
-		padding: 4px 8px;
-		border-radius: 12px;
+		background: linear-gradient(135deg, var(--background-light) 0%, #e2e8f0 100%);
+		color: var(--text-primary);
+		padding: 6px 12px;
+		border-radius: 20px;
 		font-size: 11px;
-		font-weight: 500;
+		font-weight: 600;
 		white-space: nowrap;
+		letter-spacing: 0.025em;
+		border: 1px solid var(--border-light);
 	}
 	
 	.roles-text {
-		font-size: 12px;
-		color: #7f8c8d;
+		font-size: 13px;
+		color: var(--text-secondary);
+		font-weight: 500;
 	}
 	
 	.actions-cell {
@@ -283,17 +311,28 @@
 	}
 	
 	.delete-btn {
-		background: none;
-		border: none;
+		background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+		border: 1px solid #fecaca;
 		cursor: pointer;
-		padding: 8px;
-		border-radius: 4px;
+		padding: 10px 12px;
+		border-radius: 8px;
 		font-size: 16px;
-		transition: background-color 0.2s;
+		transition: all 0.3s ease;
+		color: var(--error-red);
 	}
 	
 	.delete-btn:hover {
-		background-color: #ffe6e6;
+		background: linear-gradient(135deg, var(--error-red) 0%, #dc2626 100%);
+		color: white;
+		transform: scale(1.05);
+		box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+	}
+	
+	@media (max-width: 1024px) {
+		.table-container {
+			margin: 20px;
+			border-radius: 12px;
+		}
 	}
 	
 	@media (max-width: 768px) {
@@ -303,11 +342,25 @@
 		
 		.files-table th,
 		.files-table td {
-			padding: 12px 8px;
+			padding: 16px 12px;
 		}
 		
 		.title-cell {
-			max-width: 200px;
+			max-width: 250px;
+		}
+		
+		.file-title {
+			font-size: 14px;
+		}
+		
+		.file-description {
+			font-size: 12px;
+		}
+		
+		.category-badge,
+		.provider-badge {
+			font-size: 10px;
+			padding: 4px 8px;
 		}
 	}
 </style>

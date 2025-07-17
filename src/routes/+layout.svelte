@@ -3,9 +3,19 @@
 </script>
 
 <main class="container">
-	<header>
-		<h1>PackEx - File Upload Manager</h1>
-		<p>Upload and manage your content files</p>
+	<header class="gradient-bg">
+		<div class="header-content">
+			<div class="logo-section">
+				<img src="/pack-logo.png" alt="Pack" class="pack-logo" />
+				<div class="brand-info">
+					<h1>PackEx</h1>
+					<p>File Upload Manager</p>
+				</div>
+			</div>
+			<div class="header-description">
+				<p>Professional content management and sharing platform</p>
+			</div>
+		</div>
 	</header>
 	
 	<slot />
@@ -13,29 +23,94 @@
 
 <style>
 	.container {
-		max-width: 1200px;
+		max-width: 1400px;
 		margin: 0 auto;
-		padding: 20px;
+		min-height: 100vh;
 	}
 	
 	header {
-		text-align: center;
-		margin-bottom: 40px;
-		padding: 20px;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white;
-		border-radius: 10px;
+		margin-bottom: 32px;
+		border-radius: 0 0 24px 24px;
+		box-shadow: 0 10px 25px rgba(234, 88, 12, 0.15);
 	}
 	
-	header h1 {
-		margin: 0 0 10px 0;
-		font-size: 2.5rem;
+	.header-content {
+		padding: 32px 40px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 24px;
+	}
+	
+	.logo-section {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+	}
+	
+	.pack-logo {
+		height: 48px;
+		width: auto;
+		background: rgba(255, 255, 255, 0.9);
+		padding: 8px 12px;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+	
+	.brand-info h1 {
+		margin: 0 0 4px 0;
+		font-size: 2rem;
 		font-weight: 700;
+		color: white;
+		line-height: 1.2;
 	}
 	
-	header p {
+	.brand-info p {
 		margin: 0;
-		opacity: 0.9;
+		color: rgba(255, 255, 255, 0.9);
+		font-size: 1rem;
+		font-weight: 500;
+	}
+	
+	.header-description {
+		text-align: right;
+	}
+	
+	.header-description p {
+		margin: 0;
+		color: rgba(255, 255, 255, 0.85);
 		font-size: 1.1rem;
+		font-weight: 400;
+		max-width: 300px;
+	}
+	
+	@media (max-width: 768px) {
+		.header-content {
+			flex-direction: column;
+			text-align: center;
+			padding: 24px 20px;
+		}
+		
+		.header-description {
+			text-align: center;
+		}
+		
+		.header-description p {
+			max-width: none;
+		}
+		
+		.logo-section {
+			flex-direction: column;
+			gap: 16px;
+		}
+		
+		.pack-logo {
+			height: 40px;
+		}
+		
+		.brand-info h1 {
+			font-size: 1.75rem;
+		}
 	}
 </style>

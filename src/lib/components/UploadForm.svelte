@@ -215,52 +215,64 @@
 
 <style>
 	.upload-form {
-		max-width: 800px;
+		max-width: 900px;
+		margin: 0 auto;
+		background: var(--background-white);
+		border-radius: 16px;
+		padding: 32px;
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+		border: 1px solid var(--border-light);
 	}
 	
 	.form-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 20px;
-		margin-bottom: 20px;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 24px;
+		margin-bottom: 24px;
 	}
 	
 	.form-group {
-		margin-bottom: 20px;
+		margin-bottom: 24px;
 	}
 	
 	.form-group label {
 		display: block;
 		margin-bottom: 8px;
 		font-weight: 600;
-		color: #2c3e50;
+		color: var(--text-primary);
+		font-size: 14px;
+		letter-spacing: 0.025em;
 	}
 	
 	.form-group input,
 	.form-group select,
 	.form-group textarea {
 		width: 100%;
-		padding: 12px;
-		border: 2px solid #c7d7e3;
-		border-radius: 8px;
-		font-size: 16px;
-		transition: border-color 0.3s, box-shadow 0.3s;
+		padding: 14px 16px;
+		border: 2px solid var(--border-light);
+		border-radius: 12px;
+		font-size: 14px;
+		font-family: inherit;
+		transition: all 0.3s ease;
+		background-color: var(--background-white);
 	}
 	
 	.form-group input:focus,
 	.form-group select:focus,
 	.form-group textarea:focus {
 		outline: none;
-		border-color: #667eea;
-		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+		border-color: var(--primary-orange);
+		box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.1);
+		background-color: #fffbf7;
 	}
 	
 	.char-count {
 		display: block;
 		text-align: right;
 		font-size: 12px;
-		color: #7f8c8d;
-		margin-top: 4px;
+		color: var(--text-secondary);
+		margin-top: 6px;
+		font-weight: 500;
 	}
 	
 	fieldset {
@@ -271,83 +283,133 @@
 	
 	legend {
 		display: block;
-		margin-bottom: 8px;
+		margin-bottom: 12px;
 		font-weight: 600;
-		color: #2c3e50;
+		color: var(--text-primary);
 		padding: 0;
+		font-size: 14px;
+		letter-spacing: 0.025em;
 	}
 	
 	.checkbox-group {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 15px;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+		gap: 16px;
+		padding: 16px;
+		background: var(--background-light);
+		border-radius: 12px;
+		border: 2px solid var(--border-light);
 	}
 	
 	.checkbox-label {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		font-weight: normal;
+		gap: 10px;
+		font-weight: 500;
 		cursor: pointer;
+		color: var(--text-primary);
+		transition: all 0.2s ease;
+		padding: 8px 12px;
+		border-radius: 8px;
+	}
+	
+	.checkbox-label:hover {
+		background: var(--background-white);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 	}
 	
 	.checkbox-label input[type="checkbox"] {
-		width: auto;
+		width: 18px;
+		height: 18px;
 		margin: 0;
+		accent-color: var(--primary-orange);
 	}
 	
 	.file-help {
 		display: block;
-		margin-top: 4px;
+		margin-top: 6px;
 		font-size: 12px;
-		color: #7f8c8d;
+		color: var(--text-secondary);
+		line-height: 1.4;
+		font-weight: 500;
 	}
 	
 	.upload-progress {
-		margin: 20px 0;
+		margin: 24px 0;
+		padding: 20px;
+		background: var(--background-light);
+		border-radius: 12px;
+		text-align: center;
 	}
 	
 	.progress-bar {
 		width: 100%;
 		height: 8px;
-		background-color: #e1e8ed;
+		background-color: var(--border-medium);
 		border-radius: 4px;
 		overflow: hidden;
-		margin-bottom: 8px;
+		margin-bottom: 12px;
 	}
 	
 	.progress-fill {
 		height: 100%;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
 		transition: width 0.3s ease;
+		border-radius: 4px;
+	}
+	
+	.upload-progress span {
+		color: var(--text-primary);
+		font-weight: 600;
+		font-size: 14px;
 	}
 	
 	.form-actions {
 		text-align: center;
-		margin-top: 30px;
+		margin-top: 32px;
+		padding-top: 24px;
+		border-top: 1px solid var(--border-light);
 	}
 	
 	.submit-btn {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
 		color: white;
 		border: none;
-		padding: 15px 40px;
-		border-radius: 8px;
+		padding: 16px 48px;
+		border-radius: 12px;
 		font-size: 16px;
 		font-weight: 600;
 		cursor: pointer;
-		transition: transform 0.2s, box-shadow 0.2s;
-		min-width: 150px;
+		transition: all 0.3s ease;
+		min-width: 180px;
+		box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
 	}
 	
 	.submit-btn:hover:not(:disabled) {
 		transform: translateY(-2px);
-		box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+		box-shadow: 0 8px 25px rgba(234, 88, 12, 0.35);
 	}
 	
 	.submit-btn:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
 		transform: none;
+		box-shadow: 0 4px 12px rgba(234, 88, 12, 0.15);
+	}
+	
+	@media (max-width: 768px) {
+		.upload-form {
+			margin: 20px;
+			padding: 24px 20px;
+		}
+		
+		.form-grid {
+			grid-template-columns: 1fr;
+			gap: 20px;
+		}
+		
+		.checkbox-group {
+			grid-template-columns: 1fr;
+		}
 	}
 </style>
