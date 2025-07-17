@@ -26,15 +26,11 @@ export class StorageFactory {
         );
       
       case 'GOOGLE_DRIVE':
-        if (!config.GOOGLE_DRIVE_CLIENT_ID || !config.GOOGLE_DRIVE_CLIENT_SECRET || 
-            !config.GOOGLE_DRIVE_REDIRECT_URI || !config.GOOGLE_DRIVE_REFRESH_TOKEN) {
-          throw new Error('Missing required Google Drive configuration');
+        if (!config.GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY) {
+          throw new Error('Missing required Google Drive service account key configuration');
         }
         return new GoogleDriveStorageProvider(
-          config.GOOGLE_DRIVE_CLIENT_ID,
-          config.GOOGLE_DRIVE_CLIENT_SECRET,
-          config.GOOGLE_DRIVE_REDIRECT_URI,
-          config.GOOGLE_DRIVE_REFRESH_TOKEN,
+          config.GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY,
           config.GOOGLE_DRIVE_FOLDER_ID
         );
       

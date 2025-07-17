@@ -5,16 +5,23 @@ export class GoogleDriveStorageProvider implements StorageProvider {
   private drive: any;
 
   constructor(
-    clientId: string,
-    clientSecret: string,
-    redirectUri: string,
-    refreshToken: string,
+    serviceAccountKeyJson: string,
     private folderId?: string
   ) {
-    const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
-    oauth2Client.setCredentials({ refresh_token: refreshToken });
-    
-    this.drive = google.drive({ version: 'v3', auth: oauth2Client });
+    try {
+      // Parse the service account key JSON
+      const serviceAccountKey = JSON.parse(serviceAccountKeyJson);
+      
+      // Create JWT auth client using service account
+      const auth = new google.auth.GoogleAuth({
+        credentials: serviceAccountKey,
+        scopes: ['https://www.googleapis.com/auth/drive.file']
+      });
+      
+      this.drive = google.drive({ version: 'v3', auth });
+    } catch (error) {
+      throw new Error(`Failed to initialize Google Drive with service account: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   async uploadFile(file: File, fileName: string): Promise<StorageResult> {
