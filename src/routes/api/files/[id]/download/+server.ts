@@ -1,8 +1,14 @@
 import { error } from '@sveltejs/kit';
-import { readFile } from 'fs/promises';
-import { existsSync } from 'fs';
 import { prisma } from '$lib/db';
 import type { RequestEvent } from '@sveltejs/kit';
+import { StorageFactory, type StorageProviderType } from '$lib/storage/index.js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+const STORAGE_PROVIDER = (process.env.STORAGE_PROVIDER as StorageProviderType) || 'LOCAL';
+const storageProvider = StorageFactory.createProvider(STORAGE_PROVIDER, process.env as Record<string, string>);
 
 export const GET = async ({ params }: RequestEvent) => {
 	try {
@@ -20,11 +26,8 @@ export const GET = async ({ params }: RequestEvent) => {
 			throw error(404, 'File not found');
 		}
 		
-		if (!existsSync(file.filePath)) {
-			throw error(404, 'File not found on disk');
-		}
-		
-		const fileBuffer = await readFile(file.filePath);
+		// Download file using storage provider
+		const fileBuffer = await storageProvider.downloadFile(file.filePath);
 		
 		return new Response(fileBuffer, {
 			headers: {

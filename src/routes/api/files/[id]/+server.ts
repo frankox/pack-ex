@@ -1,8 +1,14 @@
 import { error, json } from '@sveltejs/kit';
 import { prisma } from '$lib/db';
-import { unlink } from 'fs/promises';
-import { existsSync } from 'fs';
 import type { RequestEvent } from '@sveltejs/kit';
+import { StorageFactory, type StorageProviderType } from '$lib/storage/index.js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+const STORAGE_PROVIDER = (process.env.STORAGE_PROVIDER as StorageProviderType) || 'LOCAL';
+const storageProvider = StorageFactory.createProvider(STORAGE_PROVIDER, process.env as Record<string, string>);
 
 export const DELETE = async ({ params }: RequestEvent) => {
 	try {
@@ -20,9 +26,12 @@ export const DELETE = async ({ params }: RequestEvent) => {
 			throw error(404, 'File not found');
 		}
 		
-		// Delete file from disk
-		if (existsSync(file.filePath)) {
-			await unlink(file.filePath);
+		// Delete file using storage provider
+		try {
+			await storageProvider.deleteFile(file.filePath);
+		} catch (err) {
+			console.warn('Warning: Could not delete file from storage:', err);
+			// Continue with database deletion even if file deletion fails
 		}
 		
 		// Delete from database

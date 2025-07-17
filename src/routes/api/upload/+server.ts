@@ -1,24 +1,22 @@
 import { json } from '@sveltejs/kit';
 import { prisma } from '$lib/db';
-import { writeFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import type { RequestEvent } from '@sveltejs/kit';
+import { StorageFactory, type StorageProviderType } from '$lib/storage/index.js';
+import dotenv from 'dotenv';
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || 'uploads';
+// Load environment variables
+dotenv.config();
+
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '10485760'); // 10MB
+const STORAGE_PROVIDER = (process.env.STORAGE_PROVIDER as StorageProviderType) || 'LOCAL';
 
-async function ensureUploadDir() {
-	if (!existsSync(UPLOAD_DIR)) {
-		await mkdir(UPLOAD_DIR, { recursive: true });
-	}
-}
+// Create storage provider instance
+const storageProvider = StorageFactory.createProvider(STORAGE_PROVIDER, process.env as Record<string, string>);
 
 export const POST = async ({ request }: RequestEvent) => {
 	try {
-		await ensureUploadDir();
-		
 		const formData = await request.formData();
 		const file = formData.get('file') as File;
 		
@@ -57,24 +55,25 @@ export const POST = async ({ request }: RequestEvent) => {
 		// Generate unique filename
 		const fileExtension = path.extname(file.name);
 		const fileName = `${uuidv4()}${fileExtension}`;
-		const filePath = path.join(UPLOAD_DIR, fileName);
 		
-		// Save file to disk
-		const arrayBuffer = await file.arrayBuffer();
-		const buffer = Buffer.from(arrayBuffer);
-		await writeFile(filePath, buffer);
+		// Upload file using the configured storage provider
+		const uploadResult = await storageProvider.uploadFile(file, fileName);
+		
+		if (!uploadResult.success) {
+			return json({ error: uploadResult.error || 'Upload failed' }, { status: 500 });
+		}
 		
 		// Save to database
 		const uploadedFile = await prisma.uploadedFile.create({
 			data: {
 				title: title.trim(),
 				description: description.trim(),
-				category,
-				language,
-				provider,
-				roles,
+				category: category as any, // Type assertion for enum
+				language: language as any, // Type assertion for enum
+				provider: provider as any, // Type assertion for enum
+				roles: roles as any, // Type assertion for enum array
 				fileName: file.name,
-				filePath,
+				filePath: uploadResult.filePath,
 				fileSize: file.size,
 				mimeType: file.type || 'application/octet-stream'
 			}

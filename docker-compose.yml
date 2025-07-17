@@ -21,7 +21,20 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: "postgresql://packex_user:packex_password@db:5432/packex_db?schema=public"
+      STORAGE_PROVIDER: "LOCAL"
       UPLOAD_DIR: "/app/uploads"
+      MAX_FILE_SIZE: "10485760"
+      # AWS S3 Configuration (uncomment and configure when using AWS_S3)
+      # AWS_REGION: "us-east-1"
+      # AWS_S3_BUCKET: "your-bucket-name"
+      # AWS_ACCESS_KEY_ID: "your-access-key"
+      # AWS_SECRET_ACCESS_KEY: "your-secret-key"
+      # Google Drive Configuration (uncomment and configure when using GOOGLE_DRIVE)
+      # GOOGLE_DRIVE_CLIENT_ID: "your-client-id"
+      # GOOGLE_DRIVE_CLIENT_SECRET: "your-client-secret"
+      # GOOGLE_DRIVE_REDIRECT_URI: "http://localhost:3000/auth/google/callback"
+      # GOOGLE_DRIVE_REFRESH_TOKEN: "your-refresh-token"
+      # GOOGLE_DRIVE_FOLDER_ID: "your-folder-id"
     volumes:
       - ./uploads:/app/uploads
     depends_on:
