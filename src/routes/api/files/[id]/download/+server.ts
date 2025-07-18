@@ -18,8 +18,9 @@ export const GET = async ({ params }: RequestEvent) => {
 			throw error(404, 'File not found');
 		}
 		
-		// With UploadThing, filePath contains the direct URL
-		// So we can simply redirect to it
+		// filePath contains the full URL for both storage providers
+		// For UploadThing: https://utfs.io/f/{fileKey}
+		// For local storage: http://localhost:3000/api/files/serve/{fileKey}
 		throw redirect(302, file.filePath);
 		
 	} catch (err) {

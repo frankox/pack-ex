@@ -1,4 +1,4 @@
-.PHONY: dev start-docker stop-docker setup clean help dev-local setup-local
+.PHONY: dev start-docker stop-docker setup clean help local cloud
 
 # Default target
 .DEFAULT_GOAL := help
@@ -6,6 +6,7 @@
 # Colors for output
 GREEN := \033[0;32m
 YELLOW := \033[0;33m
+BLUE := \033[0;34m
 RED := \033[0;31m
 NC := \033[0m # No Color
 
@@ -28,59 +29,57 @@ start-docker: check-docker
 	fi
 	
 
-# Main development command
-dev: start-docker
-	@echo "$(YELLOW)Setting up development environment...$(NC)"
-	@echo "$(YELLOW)Waiting for database to be ready...$(NC)"
-	@echo "$(YELLOW)Running database migrations...$(NC)"
+# =============================================================================
+# LOCAL DEPLOYMENT (Docker + Local Storage)
+# =============================================================================
+
+# Complete local setup with Docker database and local file storage
+local: start-docker
+	@echo "$(BLUE)🐳 Setting up LOCAL deployment (Docker + Local Storage)$(NC)"
+	@echo "$(YELLOW)📋 Copying local environment configuration...$(NC)"
+	@cp .env.local .env
+	@echo "$(YELLOW)📦 Installing dependencies...$(NC)"
+	@npm install --registry https://registry.npmjs.org/ > /dev/null 2>&1 || true
+	@echo "$(YELLOW)⏳ Waiting for database to be ready...$(NC)"
+	@sleep 3
+	@echo "$(YELLOW)🔧 Setting up database schema...$(NC)"
 	@npm run db:generate > /dev/null 2>&1 || true
-	@npm run db:push > /dev/null 2>&1 || true
-	@echo "$(GREEN)Starting development server...$(NC)"
-	@echo "$(YELLOW)Access the app at: http://localhost:5173$(NC)"
+	@npm run db:migrate > /dev/null 2>&1 || true
+	@echo "$(GREEN)✅ LOCAL setup complete!$(NC)"
+	@echo "$(BLUE)📁 Storage: Local filesystem (/uploads directory)$(NC)"
+	@echo "$(BLUE)🗄️  Database: Docker PostgreSQL (localhost:5432)$(NC)"
+	@echo "$(YELLOW)🚀 Starting development server...$(NC)"
+	@echo "$(GREEN)🌐 Access the app at: http://localhost:5173$(NC)"
 	@npm run dev
 
-# Docker-free development command
-dev-local:
-	@echo "$(YELLOW)Setting up Docker-free development environment...$(NC)"
-	@echo "$(YELLOW)Installing dependencies...$(NC)"
+# =============================================================================
+# CLOUD DEPLOYMENT (No Docker + Cloud Services)
+# =============================================================================
+
+# Complete cloud setup without Docker
+cloud:
+	@echo "$(BLUE)☁️  Setting up CLOUD deployment (No Docker + Cloud Services)$(NC)"
+	@echo "$(YELLOW)📋 Copying cloud environment configuration...$(NC)"
+	@cp .env.cloud .env
+	@echo "$(YELLOW)📦 Installing dependencies...$(NC)"
 	@npm install --registry https://registry.npmjs.org/ > /dev/null 2>&1 || true
-	@echo "$(YELLOW)Running database migrations...$(NC)"
+	@echo "$(YELLOW)🔧 Setting up database schema...$(NC)"
 	@npm run db:generate > /dev/null 2>&1 || true
 	@npm run db:push > /dev/null 2>&1 || true
-	@echo "$(GREEN)Starting development server...$(NC)"
-	@echo "$(YELLOW)Access the app at: http://localhost:5173$(NC)"
-	@echo "$(YELLOW)Note: Make sure your DATABASE_URL in .env points to a valid database$(NC)"
+	@echo "$(GREEN)✅ CLOUD setup complete!$(NC)"
+	@echo "$(BLUE)📁 Storage: UploadThing (Global CDN)$(NC)"
+	@echo "$(BLUE)🗄️  Database: Neon PostgreSQL (Cloud)$(NC)"
+	@echo "$(YELLOW)📝 Remember to add your UPLOADTHING_TOKEN to .env$(NC)"
+	@echo "$(YELLOW)🚀 Starting development server...$(NC)"
+	@echo "$(GREEN)🌐 Access the app at: http://localhost:5173$(NC)"
 	@npm run dev
+
 
 # Stop Docker services
 stop-docker:
 	@echo "$(YELLOW)Stopping Docker services...$(NC)"
 	@docker-compose down
 	@echo "$(GREEN)Docker services stopped!$(NC)"
-
-# Setup the project with Docker (install dependencies and prepare database)
-setup: check-docker
-	@echo "$(YELLOW)Installing dependencies...$(NC)"
-	@npm install --registry https://registry.npmjs.org/
-	@echo "$(YELLOW)Starting database...$(NC)"
-	@docker-compose up -d db
-	@echo "$(YELLOW)Waiting for database to be ready...$(NC)"
-	@sleep 5
-	@echo "$(YELLOW)Setting up database...$(NC)"
-	@npm run db:generate
-	@npm run db:migrate
-	@echo "$(GREEN)Setup complete! Run 'make dev' to start development.$(NC)"
-
-# Docker-free setup (for cloud database usage)
-setup-local:
-	@echo "$(YELLOW)Setting up Docker-free environment...$(NC)"
-	@echo "$(YELLOW)Installing dependencies...$(NC)"
-	@npm install --registry https://registry.npmjs.org/
-	@echo "$(YELLOW)Setting up database schema...$(NC)"
-	@npm run db:generate
-	@npm run db:push
-	@echo "$(GREEN)Setup complete! Run 'make dev-local' to start development.$(NC)"
-	@echo "$(YELLOW)Note: Make sure your DATABASE_URL in .env points to a valid database$(NC)"
 
 # Clean up Docker containers and volumes
 clean:
@@ -91,23 +90,18 @@ clean:
 
 # Show help
 help:
-	@echo "$(GREEN)PackEx - Available commands:$(NC)"
+	@echo "$(GREEN)🚀 PackEx - File Upload Manager$(NC)"
 	@echo ""
-	@echo "  $(YELLOW)make dev$(NC)        - Start development environment (with Docker database)"
-	@echo "  $(YELLOW)make dev-local$(NC)  - Start development environment (Docker-free, cloud DB)"
-	@echo "  $(YELLOW)make setup$(NC)      - Initial project setup with Docker database"
-	@echo "  $(YELLOW)make setup-local$(NC) - Initial project setup for Docker-free environment"
+	@echo "$(BLUE)=== MAIN COMMANDS ===$(NC)"
+	@echo "  $(GREEN)make local$(NC)       - 🐳 Complete LOCAL setup (Docker + Local Storage)"
+	@echo "  $(BLUE)Features: Docker PostgreSQL + Local file storage$(NC)"
+	@echo "  $(BLUE)No external accounts needed!$(NC)"
+	@echo "  $(GREEN)make cloud$(NC)       - ☁️  Complete CLOUD setup (No Docker + UploadThing)"
+	@echo "  $(BLUE)Features: Neon PostgreSQL + UploadThing CDN$(NC)"
+	@echo "  $(YELLOW)Remember to add your UPLOADTHING_TOKEN to .env$(NC)"
+	@echo ""
+	@echo "$(BLUE)=== UTILITY COMMANDS ===$(NC)"
 	@echo "  $(YELLOW)make start-docker$(NC) - Start only Docker services (database)"
-	@echo "  $(YELLOW)make stop-docker$(NC) - Stop Docker services"
-	@echo "  $(YELLOW)make clean$(NC)      - Clean up Docker containers and volumes"
-	@echo "  $(YELLOW)make help$(NC)       - Show this help message"
-	@echo ""
-	@echo "$(GREEN)Quick start (with Docker):$(NC)"
-	@echo "  1. Run '$(YELLOW)make setup$(NC)' for first-time setup"
-	@echo "  2. Run '$(YELLOW)make dev$(NC)' to start development"
-	@echo ""
-	@echo "$(GREEN)Quick start (Docker-free):$(NC)"
-	@echo "  1. Configure your DATABASE_URL: '$(YELLOW)cp .env.cloud.example .env$(NC)'"
-	@echo "  2. Run '$(YELLOW)make setup-local$(NC)' for first-time setup"
-	@echo "  3. Run '$(YELLOW)make dev-local$(NC)' to start development"
-	@echo ""
+	@echo "  $(YELLOW)make stop-docker$(NC)  - Stop Docker services"
+	@echo "  $(YELLOW)make clean$(NC)        - Clean up Docker containers and volumes"
+	@echo "  $(YELLOW)make help$(NC)         - Show this help message"

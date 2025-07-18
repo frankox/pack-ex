@@ -1,48 +1,105 @@
 # PackEx Deployment Guide
 
-This guide will help you deploy your PackEx application with Neon PostgreSQL and UploadThing for file storage.
+This guide will help you deploy your PackEx application with flexible storage options and database configurations.
 
-## Database Configuration
+## Storage Options
 
-Your application is already configured to use Neon PostgreSQL with the connection string:
+PackEx supports two storage providers:
+
+### 1. Local Storage (Recommended for Docker)
+- Files stored on your server's filesystem
+- No external dependencies or API keys required
+- Perfect for self-hosted deployments
+- Uses Docker volumes for persistence
+
+### 2. UploadThing (Cloud CDN)
+- Global CDN delivery for fast downloads
+- Requires UploadThing account and API token
+- Automatic file optimization and processing
+
+## Quick Docker Deployment (Local Storage)
+
+The simplest way to deploy PackEx:
+
+```bash
+# 1. Clone and navigate to project
+git clone <your-repo>
+cd pack-ex
+
+# 2. Copy local environment template
+cp .env.local.example .env
+
+# 3. Start everything with Docker
+docker-compose up -d
+
+# 4. Access your application
+# App: http://localhost:3000
+# Database: localhost:5432
+```
+
+## Database Configuration Options
+
+### Option 1: Docker PostgreSQL (Included)
+Already configured in `docker-compose.yml`:
+```
+postgresql://packex_user:packex_password@db:5432/packex_db?schema=public
+```
+
+### Option 2: Neon PostgreSQL (Cloud)
+Your application can also use Neon PostgreSQL with the connection string:
 ```
 postgresql://neondb_owner:npg_o4eBfnasCY7u@ep-bitter-cloud-ab0tp6dh-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 ```
 
-## UploadThing Setup
-
-UploadThing is already configured for your PackEx application:
-- **App ID**: `n3z70eo3f5`
-- **Region**: `sea1`
-- **API Token**: Already provided
-
 ## Environment Variables
 
-When deploying, ensure these environment variables are set:
+PackEx supports flexible environment configuration for different deployment scenarios:
 
-### For Vercel and Platforms that Support Special Characters
+### Local Storage Configuration (Docker)
+
 ```bash
-# Database (Base64 encoded for better compatibility)
-DATABASE_URL_BASE64=cG9zdGdyZXNxbDovL25lb25kYl9vd25lcjpucGdfbzRlQmZuYXNDWT==
+# Storage Configuration
+STORAGE_PROVIDER=local
+UPLOADS_DIR=/app/uploads
+PUBLIC_URL=http://localhost:3000  # Change to your domain in production
 
-# UploadThing Configuration
+# Database
+DATABASE_URL="postgresql://packex_user:packex_password@db:5432/packex_db?schema=public"
+
+# Security
+SESSION_SECRET=your-strong-production-secret
+NODE_ENV=production
+```
+
+### UploadThing Configuration (Cloud)
+
+```bash
+# Storage Configuration
+STORAGE_PROVIDER=uploadthing
 UPLOADTHING_TOKEN='eyJhcGlLZXkiOiJza19saXZlX2E2OTFjYjQ4ODQ1ZmYzYjcxMmQ2YmIyMzFiYjk4MjczM2E5MjFjMjAzMGNkNjEwNGQ1MTc1Y2YzNmI0ZmI4MmEiLCJhcHBJZCI6Im4zejcwZW8zZjUiLCJyZWdpb25zIjpbInNlYTEiXX0='
+
+# Database (Neon PostgreSQL)
+DATABASE_URL="postgresql://neondb_owner:npg_o4eBfnasCY7u@ep-bitter-cloud-ab0tp6dh-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 # Application Settings
 NODE_ENV=production
 CORS_ORIGIN=https://your-app-domain.vercel.app
 ```
 
-### Alternative: Plain Text (if your platform supports it)
+### For Vercel and Platforms with Special Character Issues
+
 ```bash
-# Database (plain text - may not work on some platforms like Vercel)
-DATABASE_URL="postgresql://neondb_owner:npg_o4eBfnasCY7u@ep-bitter-cloud-ab0tp6dh-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+# Database (Base64 encoded for better compatibility)
+DATABASE_URL_BASE64=cG9zdGdyZXNxbDovL25lb25kYl9vd25lcjpucGdfbzRlQmZuYXNDWT==
 
 # UploadThing Configuration
+STORAGE_PROVIDER=uploadthing
 UPLOADTHING_TOKEN='eyJhcGlLZXkiOiJza19saXZlX2E2OTFjYjQ4ODQ1ZmYzYjcxMmQ2YmIyMzFiYjk4MjczM2E5MjFjMjAzMGNkNjEwNGQ1MTc1Y2YzNmI0ZmI4MmEiLCJhcHBJZCI6Im4zejcwZW8zZjUiLCJyZWdpb25zIjpbInNlYTEiXX0='
 
 # Application Settings
 NODE_ENV=production
+CORS_ORIGIN=https://your-app-domain.vercel.app
+```
 ```
 
 ### Database URL Encoding

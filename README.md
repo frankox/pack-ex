@@ -1,36 +1,55 @@
 # PackEx - File Upload Manager
 
-A modern file upload and management application built with SvelteKit, TypeScript, PostgreSQL, and UploadThing. Simple, fast, and reliable file uploads with global CDN delivery.
+A modern file upload and management application built with SvelteKit, TypeScript, PostgreSQL, and flexible storage options. Simple, fast, and reliable file uploads with support for both cloud and local storage.
 
 ## Features
 
 - **File Upload**: Upload various file types (PDF, TXT, DOC, DOCX, PPT, PPTX, MP4, MOV, AVI, ZIP, Images)
-- **UploadThing Integration**: Modern file upload service with built-in CDN
+- **Flexible Storage**: Choose between UploadThing (cloud CDN) or local file storage
 - **Metadata Management**: Capture title, description, category, language, provider, and roles
 - **File Table**: Display uploaded files with sorting and search capabilities
-- **Fast Downloads**: Direct CDN links for optimal performance
+- **Fast Downloads**: Direct CDN links (UploadThing) or local serving for optimal performance
 - **Responsive Design**: Works on desktop and mobile devices
 - **Docker Support**: Easy deployment with Docker and docker-compose
+- **Local Storage Option**: Run completely locally without external dependencies
 
 ## Tech Stack
 
 - **Frontend**: SvelteKit with TypeScript
 - **Backend**: SvelteKit API routes
 - **Database**: PostgreSQL with Prisma ORM
-- **File Storage**: UploadThing (global CDN)
+- **File Storage**: UploadThing (global CDN) OR Local filesystem
 - **Containerization**: Docker & Docker Compose
+
+## Storage Options
+
+PackEx supports two storage providers:
+
+### 1. Local Storage (Default)
+- Files stored on your server's filesystem
+- No external dependencies or API keys required
+- Perfect for self-hosted deployments
+- Uses Docker volumes for persistence
+
+### 2. UploadThing (Cloud CDN)
+- Global CDN delivery for fast downloads
+- Requires UploadThing account and API token
+- Automatic file optimization and processing
+- Built-in security and access controls
 
 ## Quick Start
 
 ### Prerequisites
 
 - Node.js 20.19+
-- Docker Desktop (optional - for local database)
+- Docker Desktop (for local database and file storage)
 - Make (optional - for using Makefile commands)
 
 ### Setup Instructions
 
-#### Option 1: With Docker (Local Database)
+#### Option 1: Complete Local Setup with Docker (Recommended)
+
+This option uses local PostgreSQL database and local file storage - no external services required!
 
 1. **Clone the repository**:
    ```bash
@@ -38,15 +57,44 @@ A modern file upload and management application built with SvelteKit, TypeScript
    cd pack-ex
    ```
 
-2. **First-time setup** (installs dependencies and sets up database):
+2. **Copy environment file**:
+   ```bash
+   cp .env.local.example .env
+   ```
+
+3. **First-time setup** (installs dependencies and sets up database):
    ```bash
    make setup
    ```
 
-3. **Configure environment** (for Docker setup):
+4. **Start development** (starts database and dev server):
+   ```bash
+   make dev
+   ```
+
+#### Option 2: Docker Database + UploadThing Storage
+
+1. **Clone the repository**:
+   ```bash
+   git clone <your-repo>
+   cd pack-ex
+   ```
+
+2. **Configure environment**:
    ```bash
    cp .env.example .env
    # Edit .env and add your UPLOADTHING_TOKEN
+   # Set STORAGE_PROVIDER=uploadthing
+   ```
+
+3. **First-time setup**:
+   ```bash
+   make setup
+   ```
+
+4. **Start development**:
+   ```bash
+   make dev
    ```
 
 4. **Start development** (starts database and dev server):
@@ -140,12 +188,48 @@ If you prefer not to use Make:
    npm run dev
    ```
 
+## Storage Configuration
+
+PackEx automatically detects your storage configuration from environment variables:
+
+### Local Storage Configuration
+
+```bash
+# .env
+STORAGE_PROVIDER=local
+UPLOADS_DIR=/app/uploads  # (Docker) or ./uploads (local dev)
+PUBLIC_URL=http://localhost:3000
+```
+
+- Files are stored in the specified directory
+- Docker volume ensures file persistence
+- No external API keys required
+
+### UploadThing Configuration
+
+```bash
+# .env
+STORAGE_PROVIDER=uploadthing
+UPLOADTHING_TOKEN=your_uploadthing_token_here
+```
+
+- Get your token from [UploadThing Dashboard](https://uploadthing.com/dashboard)
+- Files are stored on UploadThing's global CDN
+- Automatic file optimization and processing
+
+### Switching Storage Providers
+
+You can switch between storage providers by changing the `STORAGE_PROVIDER` environment variable and restarting the application. **Note**: Existing files will remain in their current storage location.
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/upload` | Upload a new file with metadata |
+| GET | `/api/config/storage` | Get current storage provider configuration |
+| POST | `/api/upload/local` | Upload file to local storage (local provider only) |
+| POST | `/api/uploadthing` | UploadThing upload endpoint (uploadthing provider only) |
 | GET | `/api/files` | Get list of all uploaded files |
+| GET | `/api/files/serve/[key]` | Serve local files (local provider only) |
 | GET | `/api/files/[id]/download` | Download a specific file |
 | DELETE | `/api/files/[id]` | Delete a specific file |
 

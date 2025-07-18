@@ -1,7 +1,7 @@
 import { error, json } from '@sveltejs/kit';
 import { prisma } from '$lib/db';
 import type { RequestEvent } from '@sveltejs/kit';
-import { env } from "$env/dynamic/private";
+import { getStorageProvider, extractFileKey } from '$lib/server/storage';
 
 export const DELETE = async ({ params }: RequestEvent) => {
 	try {
@@ -19,30 +19,15 @@ export const DELETE = async ({ params }: RequestEvent) => {
 			throw error(404, 'File not found');
 		}
 		
-		// Extract file key from UploadThing URL
-		// UploadThing URLs follow the format: https://utfs.io/f/{fileKey}
-		const urlParts = file.filePath.split('/');
-		const fileKey = urlParts[urlParts.length - 1];
+		// Extract file key from URL
+		const fileKey = extractFileKey(file.filePath);
 		
-		// Delete file from UploadThing using their API
+		// Delete file from storage provider
 		try {
-			const deleteResponse = await fetch(`https://api.uploadthing.com/api/deleteFile`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Uploadthing-Api-Key': env.UPLOADTHING_TOKEN,
-				},
-				body: JSON.stringify({
-					fileKeys: [fileKey]
-				})
-			});
-			
-			if (!deleteResponse.ok) {
-				console.warn('Warning: Could not delete file from UploadThing:', await deleteResponse.text());
-				// Continue with database deletion even if file deletion fails
-			}
+			const storageProvider = getStorageProvider();
+			await storageProvider.deleteFile(fileKey);
 		} catch (err) {
-			console.warn('Warning: Could not delete file from UploadThing:', err);
+			console.warn('Warning: Could not delete file from storage:', err);
 			// Continue with database deletion even if file deletion fails
 		}
 		

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { createUploadThing } from "$lib/utils/uploadthing";
+	import { uploadLocalFile, getStorageProvider } from "$lib/utils/upload";
+	import { onMount } from "svelte";
 	
 	export let onSuccess: (() => void) | undefined = undefined;
 	
@@ -15,8 +17,19 @@
 	let fileInput: HTMLInputElement;
 	let isUploading = false;
 	let selectedFile: File | null = null;
+	let storageProvider = 'local'; // default to local
 
-	// Create UploadThing uploader
+	// Detect storage provider on mount
+	onMount(async () => {
+		try {
+			storageProvider = await getStorageProvider();
+		} catch (error) {
+			console.warn('Failed to get storage provider, defaulting to local:', error);
+			storageProvider = 'local';
+		}
+	});
+
+	// Create UploadThing uploader (only used if storage provider is uploadthing)
 	const { startUpload } = createUploadThing("fileUploader", {
 		onClientUploadComplete: (res) => {
 			console.log("Upload Completed", res);
@@ -130,8 +143,19 @@
 		isUploading = true;
 		
 		try {
-			// Start UploadThing upload
-			await startUpload([selectedFile]);
+			if (storageProvider === 'local') {
+				// Use local storage upload
+				const uploadResult = await uploadLocalFile(selectedFile);
+				await handleUploadSuccess({
+					url: uploadResult.url,
+					key: uploadResult.key,
+					name: uploadResult.name,
+					size: uploadResult.size
+				});
+			} else {
+				// Use UploadThing upload
+				await startUpload([selectedFile]);
+			}
 		} catch (error) {
 			console.error('Upload failed:', error);
 			alert('Upload failed: ' + error);

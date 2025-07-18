@@ -16,7 +16,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  # PackEx application with UploadThing
+  # PackEx application with configurable storage
   app:
     build: .
     container_name: packex_app
@@ -26,15 +26,26 @@ services:
       # Use local database (comment out to use Neon)
       DATABASE_URL: "postgresql://packex_user:packex_password@db:5432/packex_db?schema=public"
       
-      # UploadThing Configuration
-      UPLOADTHING_TOKEN: "${UPLOADTHING_TOKEN}"
+      # Storage Configuration
+      # Options: "uploadthing" or "local"
+      STORAGE_PROVIDER: "${STORAGE_PROVIDER:-local}"
+      
+      # UploadThing Configuration (only needed if STORAGE_PROVIDER=uploadthing)
+      UPLOADTHING_TOKEN: "${UPLOADTHING_TOKEN:-}"
+      
+      # Local Storage Configuration
+      UPLOADS_DIR: "/app/uploads"
+      PUBLIC_URL: "http://localhost:3000"
       
       # Application Settings
       NODE_ENV: "production"
-      SESSION_SECRET: "${SESSION_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET:-dev-secret-change-in-production}"
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
       - db
     restart: unless-stopped
 
 volumes:
   postgres_data:
+  uploads_data:

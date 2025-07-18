@@ -17,6 +17,9 @@ RUN npx prisma generate
 # Build the app
 RUN npm run build
 
+# Create uploads directory for local storage
+RUN mkdir -p /app/uploads
+
 # Expose port
 EXPOSE 3000
 
