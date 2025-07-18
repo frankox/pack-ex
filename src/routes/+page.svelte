@@ -8,6 +8,8 @@
 	let pagination: any = null;
 	let showUploadModal = false;
 	let loading = true;
+	let searchQuery = '';
+	let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 	
 	// Pagination state
 	let currentPage = 1;
@@ -16,7 +18,16 @@
 	async function loadFiles() {
 		try {
 			loading = true;
-			const response = await fetch(`/api/files?page=${currentPage}&pageSize=${pageSize}`);
+			const params = new URLSearchParams({
+				page: currentPage.toString(),
+				pageSize: pageSize.toString()
+			});
+			
+			if (searchQuery.trim().length >= 3) {
+				params.append('search', searchQuery.trim());
+			}
+			
+			const response = await fetch(`/api/files?${params}`);
 			const data = await response.json();
 			
 			if (response.ok) {
@@ -29,6 +40,21 @@
 			console.error('Error loading files:', error);
 		} finally {
 			loading = false;
+		}
+	}
+	
+	function handleSearchInput() {
+		// Clear existing timeout
+		if (searchTimeout) {
+			clearTimeout(searchTimeout);
+		}
+		
+		// Only search if query has at least 3 characters or is empty (to reset)
+		if (searchQuery.trim().length >= 3 || searchQuery.trim().length === 0) {
+			searchTimeout = setTimeout(() => {
+				currentPage = 1; // Reset to first page when searching
+				loadFiles();
+			}, 300);
 		}
 	}
 	
@@ -61,6 +87,18 @@
 	<div class="content-section">
 		<div class="main-card">
 			<div class="card-header">
+				<div class="search-container">
+					<input 
+						type="text" 
+						placeholder="Search files (title, description, filename)..." 
+						bind:value={searchQuery}
+						on:input={handleSearchInput}
+						class="search-input"
+					/>
+					<svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</div>
 				<button 
 					class="upload-btn" 
 					on:click={() => showUploadModal = true}
@@ -120,11 +158,48 @@
 	
 	.card-header {
 		display: flex;
-		justify-content: space-between;
+		justify-content: end;
 		align-items: center;
 		padding: 24px 32px;
 		border-bottom: 1px solid var(--border-light);
 		background: var(--background-white);
+		gap: 24px;
+	}
+	
+	.search-container {
+		flex: 1;
+		max-width: 400px;
+		position: relative;
+	}
+	
+	.search-input {
+		width: 100%;
+		padding: 12px 16px 12px 44px;
+		border: 2px solid var(--border-light);
+		border-radius: 12px;
+		font-size: 14px;
+		background: var(--background-white);
+		transition: all 0.3s ease;
+		color: var(--text-primary);
+	}
+	
+	.search-input:focus {
+		outline: none;
+		border-color: var(--primary-orange);
+		box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+	}
+	
+	.search-input::placeholder {
+		color: var(--text-secondary);
+	}
+	
+	.search-icon {
+		position: absolute;
+		left: 14px;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--text-secondary);
+		pointer-events: none;
 	}
 	
 	.card-content {
@@ -201,14 +276,21 @@
 		
 		.card-header {
 			flex-direction: column;
-			gap: 20px;
+			gap: 16px;
 			padding: 20px;
 			text-align: center;
+		}
+		
+		.search-container {
+			max-width: none;
+			width: 100%;
 		}
 		
 		.upload-btn {
 			padding: 12px 24px;
 			font-size: 15px;
+			width: 100%;
+			justify-content: center;
 		}
 	}
 </style>

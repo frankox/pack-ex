@@ -233,7 +233,7 @@
 			<div class="progress-bar">
 				<div class="progress-fill" style="width: 100%"></div>
 			</div>
-			<span>Uploading to UploadThing...</span>
+			<span>Uploading...</span>
 		</div>
 	{/if}
 	

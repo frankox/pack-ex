@@ -6,15 +6,43 @@ export const GET = async ({ url }: RequestEvent) => {
 	try {
 		const page = parseInt(url.searchParams.get('page') || '1');
 		const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
+		const search = url.searchParams.get('search') || '';
 		
 		const validatedPage = Math.max(1, page);
 		const validatedPageSize = Math.min(Math.max(1, pageSize), 100);
 		
 		const skip = (validatedPage - 1) * validatedPageSize;
 		
-		const totalCount = await prisma.uploadedFile.count();
+		// Build where clause for search
+		const whereClause = search ? {
+			OR: [
+				{
+					title: {
+						contains: search,
+						mode: 'insensitive' as const
+					}
+				},
+				{
+					description: {
+						contains: search,
+						mode: 'insensitive' as const
+					}
+				},
+				{
+					fileName: {
+						contains: search,
+						mode: 'insensitive' as const
+					}
+				}
+			]
+		} : {};
+		
+		const totalCount = await prisma.uploadedFile.count({
+			where: whereClause
+		});
 		
 		const files = await prisma.uploadedFile.findMany({
+			where: whereClause,
 			skip,
 			take: validatedPageSize,
 			orderBy: {
