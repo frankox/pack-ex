@@ -2,6 +2,18 @@
 
 A modern file upload and management application built with SvelteKit, TypeScript, PostgreSQL, and flexible storage options. Simple, fast, and reliable file uploads with support for both cloud and local storage.
 
+## 🚀 Quick Start
+
+**Get started in seconds:**
+
+```bash
+# Local setup (no external services needed)
+git clone <your-repo> && cd pack-ex && make local
+
+# Cloud setup (with UploadThing CDN)
+git clone <your-repo> && cd pack-ex && make cloud
+```
+
 ## Features
 
 - **File Upload**: Upload various file types (PDF, TXT, DOC, DOCX, PPT, PPTX, MP4, MOV, AVI, ZIP, Images)
@@ -47,89 +59,46 @@ PackEx supports two storage providers:
 
 ### Setup Instructions
 
-#### Option 1: Complete Local Setup with Docker (Recommended)
+#### Option 1: Complete Local Setup (Recommended)
 
-This option uses local PostgreSQL database and local file storage - no external services required!
+**Perfect for development - no external services required!**
 
-1. **Clone the repository**:
-   ```bash
-   git clone <your-repo>
-   cd pack-ex
-   ```
+```bash
+# 1. Clone the repository
+git clone <your-repo>
+cd pack-ex
 
-2. **Copy environment file**:
-   ```bash
-   cp .env.local.example .env
-   ```
+# 2. One-command setup and start
+make local
+```
 
-3. **First-time setup** (installs dependencies and sets up database):
-   ```bash
-   make setup
-   ```
+**Features:**
+- 🐳 Docker PostgreSQL database
+- 📁 Local file storage (persistent with Docker volumes)
+- 🚀 No external accounts or API keys needed
+- ⚡ Fast setup and development
 
-4. **Start development** (starts database and dev server):
-   ```bash
-   make dev
-   ```
+#### Option 2: Cloud Setup 
 
-#### Option 2: Docker Database + UploadThing Storage
+**Uses cloud services for database and storage:**
 
-1. **Clone the repository**:
-   ```bash
-   git clone <your-repo>
-   cd pack-ex
-   ```
+```bash
+# 1. Clone the repository
+git clone <your-repo>
+cd pack-ex
 
-2. **Configure environment**:
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your UPLOADTHING_TOKEN
-   # Set STORAGE_PROVIDER=uploadthing
-   ```
+# 2. One-command setup and start
+make cloud
 
-3. **First-time setup**:
-   ```bash
-   make setup
-   ```
+# 3. Add your UploadThing token to .env
+# UPLOADTHING_TOKEN=your_token_here
+```
 
-4. **Start development**:
-   ```bash
-   make dev
-   ```
-
-4. **Start development** (starts database and dev server):
-   ```bash
-   make dev
-   ```
-
-#### Option 2: Without Docker (Cloud Database)
-
-1. **Clone the repository**:
-   ```bash
-   git clone <your-repo>
-   cd pack-ex
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment** (for cloud database):
-   ```bash
-   cp .env.cloud.example .env
-   # Edit .env with your DATABASE_URL and UPLOADTHING_TOKEN
-   ```
-
-4. **Set up database schema**:
-   ```bash
-   npm run db:push
-   ```
-
-5. **Start development server**:
-   ```bash
-   npm run dev
-   ```
+**Features:**
+- ☁️ Neon PostgreSQL (cloud database)
+- 🌐 UploadThing CDN (global file storage)
+- 📈 Scalable cloud infrastructure
+- 🔧 Requires UploadThing account
 
 ### Access the application
 - **App**: http://localhost:5173
@@ -139,54 +108,65 @@ This option uses local PostgreSQL database and local file storage - no external 
 
 | Command | Description |
 |---------|-------------|
-| `make help` | Show all available commands |
-| `make setup` | Initial project setup with Docker database |
-| `make setup-local` | Initial project setup for Docker-free environment |
-| `make dev` | Start development environment (with Docker database) |
-| `make dev-local` | Start development environment (Docker-free, cloud DB) |
-| `make start-docker` | Start only the database container |
+| `make local` | 🐳 Complete LOCAL setup (Docker + Local Storage) |
+| `make cloud` | ☁️ Complete CLOUD setup (No Docker + UploadThing) |
+| `make start-docker` | Start only Docker services (database) |
 | `make stop-docker` | Stop Docker services |
 | `make clean` | Clean up Docker containers and volumes |
+| `make help` | Show all available commands |
 
 ### Quick Commands
 
-**With Docker (Local Database):**
+**🐳 Local Development (Recommended):**
 ```bash
-make setup     # First-time setup
-make dev       # Start development
+make local     # One command setup + start
 ```
 
-**Docker-free (Cloud Database):**
+**☁️ Cloud Development:**
 ```bash
-# Configure your DATABASE_URL in .env first
-make setup-local  # First-time setup
-make dev-local    # Start development
+make cloud     # One command setup + start
+# Remember to add UPLOADTHING_TOKEN to .env
 ```
 
 ### Alternative Setup (Manual)
 
 If you prefer not to use Make:
 
-1. **Install dependencies**:
-   ```bash
-   npm install --registry https://registry.npmjs.org/
-   ```
+**Local Setup:**
+```bash
+# 1. Copy environment configuration
+cp .env.local.example .env
 
-2. **Start database**:
-   ```bash
-   docker-compose up -d db
-   ```
+# 2. Install dependencies
+npm install --registry https://registry.npmjs.org/
 
-3. **Set up database**:
-   ```bash
-   npm run db:generate
-   npm run db:migrate
-   ```
+# 3. Start database
+docker-compose up -d db
 
-4. **Start development server**:
-   ```bash
-   npm run dev
-   ```
+# 4. Set up database
+npm run db:generate
+npm run db:migrate
+
+# 5. Start development server
+npm run dev
+```
+
+**Cloud Setup:**
+```bash
+# 1. Copy environment configuration
+cp .env.cloud.example .env
+# Edit .env with your UPLOADTHING_TOKEN
+
+# 2. Install dependencies
+npm install --registry https://registry.npmjs.org/
+
+# 3. Set up database
+npm run db:generate
+npm run db:push
+
+# 4. Start development server
+npm run dev
+```
 
 ## Storage Configuration
 
@@ -269,86 +249,80 @@ pack-ex/
 ├── src/
 │   ├── lib/
 │   │   ├── components/
-│   │   │   ├── UploadForm.svelte
-│   │   │   └── FileTable.svelte
-│   │   ├── storage/           # Storage abstraction layer
-│   │   │   ├── index.ts
-│   │   │   ├── local.ts
-│   │   │   ├── aws-s3.ts
-│   │   │   └── google-drive.ts
-│   │   └── db.ts
+│   │   │   ├── UploadForm.svelte      # Smart upload form (local/cloud)
+│   │   │   ├── FileTable.svelte       # File listing and management
+│   │   │   ├── FileViewer.svelte      # File preview component
+│   │   │   └── Modal.svelte           # Modal dialog component
+│   │   ├── server/
+│   │   │   ├── storage.ts             # Storage provider abstraction
+│   │   │   └── uploadthing.ts         # UploadThing configuration
+│   │   ├── utils/
+│   │   │   ├── upload.ts              # Upload utilities
+│   │   │   ├── database.ts            # Database utilities
+│   │   │   ├── debounce.ts            # Debounce utility
+│   │   │   └── uploadthing.ts         # UploadThing helpers
+│   │   └── db.ts                      # Prisma client
 │   ├── routes/
 │   │   ├── api/
-│   │   │   ├── upload/
-│   │   │   └── files/
-│   │   ├── +layout.svelte
-│   │   └── +page.svelte
-│   ├── app.css
-│   └── app.html
+│   │   │   ├── config/storage/        # Storage configuration API
+│   │   │   ├── upload/local/          # Local upload endpoint
+│   │   │   ├── uploadthing/           # UploadThing endpoint
+│   │   │   └── files/                 # File management APIs
+│   │   ├── +layout.svelte             # App layout
+│   │   └── +page.svelte               # Main page
+│   ├── app.css                        # Global styles
+│   └── app.html                       # HTML template
 ├── prisma/
-│   └── schema.prisma
-├── docker-compose.yml
-├── Dockerfile
-├── configure-storage.js      # Storage configuration script
-├── CLOUD_STORAGE.md         # Cloud storage setup guide
-└── README.md
+│   └── schema.prisma                  # Database schema
+├── docker-compose.yml                 # Docker services
+├── Dockerfile                         # App container
+├── .env.local.example                 # Local development template
+├── .env.cloud.example                 # Cloud development template
+├── DEPLOYMENT.md                      # Deployment guide
+├── STORAGE_IMPLEMENTATION.md          # Storage system docs
+└── README.md                          # This file
 ```
 
 ## Environment Configuration
 
-PackEx provides different environment templates for different setups:
+PackEx automatically configures the appropriate environment based on your chosen setup:
 
-| File | Purpose | Usage |
-|------|---------|-------|
-| `.env.example` | Docker setup template | Local development with Docker PostgreSQL |
-| `.env.cloud.example` | Cloud setup template | Docker-free development with cloud database |
-| `.env.local` | Local development | Current local configuration |
-| `.env.production` | Production deployment | Production environment with Neon database |
-
-Choose the appropriate template based on your development approach:
-
-- **Docker development**: `cp .env.example .env`
-- **Cloud development**: `cp .env.cloud.example .env`
-
-### Storage Configuration
-
-PackEx supports multiple storage providers. Configure your preferred option:
-
+### Local Storage Environment (.env.local.example)
 ```bash
-# Storage Provider (LOCAL, AWS_S3, GOOGLE_DRIVE)
-STORAGE_PROVIDER=LOCAL
+# Storage Configuration - Use local storage by default
+STORAGE_PROVIDER=local
 
-# Database
-DATABASE_URL="postgresql://packex_user:packex_password@localhost:5432/packex_db?schema=public"
+# Database (Docker PostgreSQL)
+DATABASE_URL="postgresql://packex_user:packex_password@db:5432/packex_db?schema=public"
 
-# File Upload Settings
-MAX_FILE_SIZE=10485760  # 10MB
+# Local file storage settings
+UPLOADS_DIR=/app/uploads
+PUBLIC_URL=http://localhost:3000
 
-# Local Storage (when STORAGE_PROVIDER=LOCAL)
-UPLOAD_DIR="uploads"
-
-# AWS S3 Storage (when STORAGE_PROVIDER=AWS_S3)
-AWS_REGION=us-east-1
-AWS_S3_BUCKET=your-bucket-name
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-
-# Google Drive Storage (when STORAGE_PROVIDER=GOOGLE_DRIVE)
-GOOGLE_DRIVE_CLIENT_ID=your-client-id
-GOOGLE_DRIVE_CLIENT_SECRET=your-client-secret
-GOOGLE_DRIVE_REDIRECT_URI=http://localhost:3000/auth/google/callback
-GOOGLE_DRIVE_REFRESH_TOKEN=your-refresh-token
-GOOGLE_DRIVE_FOLDER_ID=your-folder-id
+# Security
+SESSION_SECRET=your-strong-secret-change-in-production
 ```
 
-### Quick Configuration
-
-Use the interactive configuration tool:
+### Cloud Environment (.env.cloud.example)
 ```bash
-npm run configure-storage
+# Storage Configuration - Use UploadThing CDN
+STORAGE_PROVIDER=uploadthing
+UPLOADTHING_TOKEN=your_uploadthing_token_here
+
+# Database (Neon PostgreSQL)
+DATABASE_URL="postgresql://neondb_owner:npg_o4eBfna...@ep-bitter-cloud...neon.tech/neondb?sslmode=require"
+
+# Security
+SESSION_SECRET=your-strong-secret-change-in-production
 ```
 
-For detailed setup instructions, see [CLOUD_STORAGE.md](./CLOUD_STORAGE.md).
+### Environment Files
+
+| File | Used By | Purpose |
+|------|---------|---------|
+| `.env.local.example` | `make local` | Docker + Local storage template |
+| `.env.cloud.example` | `make cloud` | Cloud services template |
+| `.env` | Application | Active configuration (auto-created) |
 
 ## Development
 
