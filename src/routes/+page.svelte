@@ -3,15 +3,14 @@
 	import UploadForm from '$lib/components/UploadForm.svelte';
 	import FileTable from '$lib/components/FileTable.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import { debounce } from '$lib/utils/debounce';
 	
 	let files: any[] = [];
 	let pagination: any = null;
 	let showUploadModal = false;
 	let loading = true;
 	let searchQuery = '';
-	let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 	
-	// Pagination state
 	let currentPage = 1;
 	let pageSize = 10;
 	
@@ -43,18 +42,14 @@
 		}
 	}
 	
+	const debouncedSearch = debounce(() => {
+		currentPage = 1; 
+		loadFiles();
+	}, 300);
+	
 	function handleSearchInput() {
-		// Clear existing timeout
-		if (searchTimeout) {
-			clearTimeout(searchTimeout);
-		}
-		
-		// Only search if query has at least 3 characters or is empty (to reset)
 		if (searchQuery.trim().length >= 3 || searchQuery.trim().length === 0) {
-			searchTimeout = setTimeout(() => {
-				currentPage = 1; // Reset to first page when searching
-				loadFiles();
-			}, 300);
+			debouncedSearch();
 		}
 	}
 	
