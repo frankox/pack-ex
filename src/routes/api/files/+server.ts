@@ -7,6 +7,8 @@ export const GET = async ({ url }: RequestEvent) => {
 		const page = parseInt(url.searchParams.get('page') || '1');
 		const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
 		const search = url.searchParams.get('search') || '';
+		const sortBy = url.searchParams.get('sortBy') || 'title';
+		const sortOrder = url.searchParams.get('sortOrder') || 'asc';
 		
 		const validatedPage = Math.max(1, page);
 		const validatedPageSize = Math.min(Math.max(1, pageSize), 100);
@@ -37,6 +39,15 @@ export const GET = async ({ url }: RequestEvent) => {
 			]
 		} : {};
 		
+		// Build order by clause
+		const validSortFields = ['title', 'category', 'language', 'provider', 'fileSize', 'createdAt'];
+		const validatedSortBy = validSortFields.includes(sortBy) ? sortBy : 'title';
+		const validatedSortOrder = sortOrder === 'desc' ? 'desc' : 'asc';
+		
+		const orderByClause = {
+			[validatedSortBy]: validatedSortOrder
+		};
+		
 		const totalCount = await prisma.uploadedFile.count({
 			where: whereClause
 		});
@@ -45,9 +56,7 @@ export const GET = async ({ url }: RequestEvent) => {
 			where: whereClause,
 			skip,
 			take: validatedPageSize,
-			orderBy: {
-				createdAt: 'desc'
-			}
+			orderBy: orderByClause
 		});
 		
 		const totalPages = Math.ceil(totalCount / validatedPageSize);

@@ -3,9 +3,12 @@
 	
 	export let files: any[] = [];
 	export let pagination: any = null;
+	export let sortBy: string = 'title';
+	export let sortOrder: string = 'asc';
 	export let onRefresh: (() => void) | undefined = undefined;
 	export let onPageChange: ((page: number) => void) | undefined = undefined;
 	export let onPageSizeChange: ((pageSize: number) => void) | undefined = undefined;
+	export let onSortChange: ((column: string) => void) | undefined = undefined;
 	
 	let selectedFile: any = null;
 	let isViewerOpen = false;
@@ -112,6 +115,15 @@
 			alert('Error deleting file: ' + error);
 		}
 	}
+	
+	function handleSort(column: string) {
+		onSortChange?.(column);
+	}
+	
+	function getSortIcon(column: string): string {
+		if (sortBy !== column) return '↕️';
+		return sortOrder === 'asc' ? '↑' : '↓';
+	}
 </script>
 
 <div class="table-container">
@@ -126,13 +138,67 @@
 			<table class="files-table">
 				<thead>
 					<tr>
-						<th>Title</th>
-						<th>Category</th>
-						<th>Language</th>
-						<th>Provider</th>
+						<th 
+							class="sortable-header" 
+							class:active={sortBy === 'title'}
+							on:click={() => handleSort('title')}
+						>
+							<div class="header-content">
+								<span>Title</span>
+								<span class="sort-icon">{getSortIcon('title')}</span>
+							</div>
+						</th>
+						<th 
+							class="sortable-header" 
+							class:active={sortBy === 'category'}
+							on:click={() => handleSort('category')}
+						>
+							<div class="header-content">
+								<span>Category</span>
+								<span class="sort-icon">{getSortIcon('category')}</span>
+							</div>
+						</th>
+						<th 
+							class="sortable-header" 
+							class:active={sortBy === 'language'}
+							on:click={() => handleSort('language')}
+						>
+							<div class="header-content">
+								<span>Language</span>
+								<span class="sort-icon">{getSortIcon('language')}</span>
+							</div>
+						</th>
+						<th 
+							class="sortable-header" 
+							class:active={sortBy === 'provider'}
+							on:click={() => handleSort('provider')}
+						>
+							<div class="header-content">
+								<span>Provider</span>
+								<span class="sort-icon">{getSortIcon('provider')}</span>
+							</div>
+						</th>
 						<th>Roles</th>
-						<th>File Size</th>
-						<th>Upload Date</th>
+						<th 
+							class="sortable-header" 
+							class:active={sortBy === 'fileSize'}
+							on:click={() => handleSort('fileSize')}
+						>
+							<div class="header-content">
+								<span>File Size</span>
+								<span class="sort-icon">{getSortIcon('fileSize')}</span>
+							</div>
+						</th>
+						<th 
+							class="sortable-header" 
+							class:active={sortBy === 'createdAt'}
+							on:click={() => handleSort('createdAt')}
+						>
+							<div class="header-content">
+								<span>Upload Date</span>
+								<span class="sort-icon">{getSortIcon('createdAt')}</span>
+							</div>
+						</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -159,20 +225,22 @@
 							<td>{formatFileSize(file.fileSize)}</td>
 							<td>{formatDate(file.createdAt)}</td>
 							<td class="actions-cell">
-								<button 
-									class="download-btn" 
-									on:click={(e) => handleDownload(file, e)}
-									title="Download file"
-								>
-									📥
-								</button>
-								<button 
-									class="delete-btn" 
-									on:click={(e) => handleDelete(file, e)}
-									title="Delete file"
-								>
-									🗑️
-								</button>
+								<div class="actions-wrapper">
+									<button 
+										class="download-btn" 
+										on:click={(e) => handleDownload(file, e)}
+										title="Download file"
+									>
+										📥
+									</button>
+									<button 
+										class="delete-btn" 
+										on:click={(e) => handleDelete(file, e)}
+										title="Delete file"
+									>
+										🗑️
+									</button>
+								</div>
 							</td>
 						</tr>
 					{/each}
@@ -306,10 +374,12 @@
 	
 	.table-wrapper {
 		overflow-x: auto;
+        height: 100%;
 	}
 	
 	.files-table {
 		width: 100%;
+        height: 100%;
 		border-collapse: collapse;
 		font-size: 14px;
 	}
@@ -325,12 +395,51 @@
 		font-size: 13px;
 		letter-spacing: 0.025em;
 		text-transform: uppercase;
+		position: relative;
+	}
+	
+	.sortable-header {
+		cursor: pointer;
+		transition: all 0.2s ease;
+		user-select: none;
+	}
+	
+	.sortable-header:hover {
+		background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+		color: var(--primary-orange);
+	}
+	
+	.sortable-header.active {
+		background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
+		color: white;
+	}
+	
+	.header-content {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
+	
+	.sort-icon {
+		font-size: 12px;
+		opacity: 0.7;
+		transition: opacity 0.2s ease;
+	}
+	
+	.sortable-header:hover .sort-icon {
+		opacity: 1;
+	}
+	
+	.sortable-header.active .sort-icon {
+		opacity: 1;
+		font-weight: bold;
 	}
 	
 	.files-table td {
-		padding: 20px 16px;
+		padding: 16px 12px;
 		border-bottom: 1px solid var(--border-light);
-		vertical-align: top;
+		vertical-align: middle;
 	}
 	
 	.file-row {
@@ -417,6 +526,14 @@
 	
 	.actions-cell {
 		text-align: center;
+		vertical-align: middle;
+	}
+	
+	.actions-wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
 	}
 	
 	.download-btn,
@@ -427,7 +544,8 @@
 		border-radius: 8px;
 		font-size: 16px;
 		transition: all 0.3s ease;
-		margin: 0 4px;
+		margin: 0;
+		vertical-align: middle;
 	}
 	
 	.download-btn {

@@ -13,13 +13,17 @@
 	
 	let currentPage = 1;
 	let pageSize = 10;
+	let sortBy = 'title';
+	let sortOrder = 'asc';
 	
 	async function loadFiles() {
 		try {
 			loading = true;
 			const params = new URLSearchParams({
 				page: currentPage.toString(),
-				pageSize: pageSize.toString()
+				pageSize: pageSize.toString(),
+				sortBy: sortBy,
+				sortOrder: sortOrder
 			});
 			
 			if (searchQuery.trim().length >= 3) {
@@ -71,6 +75,19 @@
 		loadFiles();
 	}
 	
+	function handleSortChange(column: string) {
+		if (sortBy === column) {
+			// Toggle sort order if same column
+			sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+		} else {
+			// Set new column with ascending order
+			sortBy = column;
+			sortOrder = 'asc';
+		}
+		currentPage = 1; // Reset to first page when sorting
+		loadFiles();
+	}
+	
 	onMount(loadFiles);
 </script>
 
@@ -113,9 +130,12 @@
 					<FileTable 
 						{files} 
 						{pagination}
+						{sortBy}
+						{sortOrder}
 						onRefresh={loadFiles} 
 						onPageChange={handlePageChange}
 						onPageSizeChange={handlePageSizeChange}
+						onSortChange={handleSortChange}
 					/>
 				{/if}
 			</div>
