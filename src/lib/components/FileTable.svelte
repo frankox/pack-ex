@@ -1,6 +1,11 @@
 <script lang="ts">
+	import FileViewer from './FileViewer.svelte';
+	
 	export let files: any[] = [];
 	export let onRefresh: (() => void) | undefined = undefined;
+	
+	let selectedFile: any = null;
+	let isViewerOpen = false;
 	
 	function formatFileSize(bytes: number): string {
 		if (bytes === 0) return '0 Bytes';
@@ -67,10 +72,17 @@
 	}
 	
 	async function handleRowClick(file: any) {
+		selectedFile = file;
+		isViewerOpen = true;
+	}
+	
+	async function handleDownload(file: any, event: Event) {
+		event.stopPropagation();
+		
 		try {
 			window.open(`/api/files/${file.id}/download`, '_blank');
 		} catch (error) {
-			console.error('Error opening file:', error);
+			console.error('Error downloading file:', error);
 		}
 	}
 	
@@ -143,6 +155,13 @@
 							<td>{formatDate(file.createdAt)}</td>
 							<td class="actions-cell">
 								<button 
+									class="download-btn" 
+									on:click={(e) => handleDownload(file, e)}
+									title="Download file"
+								>
+									📥
+								</button>
+								<button 
 									class="delete-btn" 
 									on:click={(e) => handleDelete(file, e)}
 									title="Delete file"
@@ -157,6 +176,12 @@
 		</div>
 	{/if}
 </div>
+
+<FileViewer 
+	bind:isOpen={isViewerOpen} 
+	file={selectedFile} 
+	onClose={() => isViewerOpen = false} 
+/>
 
 <style>
 	.table-container {
@@ -230,7 +255,6 @@
 	
 	.file-row:hover {
 		background: linear-gradient(135deg, #fffbf7 0%, var(--background-light) 100%);
-		transform: translateX(2px);
 		box-shadow: 0 4px 12px rgba(234, 88, 12, 0.08);
 	}
 	
@@ -310,14 +334,33 @@
 		text-align: center;
 	}
 	
+	.download-btn,
 	.delete-btn {
-		background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-		border: 1px solid #fecaca;
+		border: none;
 		cursor: pointer;
 		padding: 10px 12px;
 		border-radius: 8px;
 		font-size: 16px;
 		transition: all 0.3s ease;
+		margin: 0 4px;
+	}
+	
+	.download-btn {
+		background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+		border: 1px solid #bfdbfe;
+		color: #1d4ed8;
+	}
+	
+	.download-btn:hover {
+		background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+		color: white;
+		transform: scale(1.05);
+		box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+	}
+	
+	.delete-btn {
+		background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+		border: 1px solid #fecaca;
 		color: var(--error-red);
 	}
 	
