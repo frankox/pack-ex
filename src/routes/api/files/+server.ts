@@ -2,15 +2,41 @@ import { json } from '@sveltejs/kit';
 import { prisma } from '$lib/db';
 import type { RequestEvent } from '@sveltejs/kit';
 
-export const GET = async () => {
+export const GET = async ({ url }: RequestEvent) => {
 	try {
+		const page = parseInt(url.searchParams.get('page') || '1');
+		const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
+		
+		const validatedPage = Math.max(1, page);
+		const validatedPageSize = Math.min(Math.max(1, pageSize), 100);
+		
+		const skip = (validatedPage - 1) * validatedPageSize;
+		
+		const totalCount = await prisma.uploadedFile.count();
+		
 		const files = await prisma.uploadedFile.findMany({
+			skip,
+			take: validatedPageSize,
 			orderBy: {
 				createdAt: 'desc'
 			}
 		});
 		
-		return json(files);
+		const totalPages = Math.ceil(totalCount / validatedPageSize);
+		const hasNextPage = validatedPage < totalPages;
+		const hasPreviousPage = validatedPage > 1;
+		
+		return json({
+			files,
+			pagination: {
+				currentPage: validatedPage,
+				pageSize: validatedPageSize,
+				totalCount,
+				totalPages,
+				hasNextPage,
+				hasPreviousPage
+			}
+		});
 	} catch (error) {
 		console.error('Error fetching files:', error);
 		return json({ error: 'Failed to fetch files' }, { status: 500 });
@@ -21,7 +47,6 @@ export const POST = async ({ request }: RequestEvent) => {
 	try {
 		const data = await request.json();
 		
-		// Validate required fields
 		const { title, description, category, language, provider, roles, fileName, filePath, fileSize, mimeType } = data;
 		
 		if (!title || !description || !category || !language || !provider || !roles || !fileName || !filePath || !fileSize || !mimeType) {
@@ -32,7 +57,6 @@ export const POST = async ({ request }: RequestEvent) => {
 			return json({ error: 'At least one role must be selected' }, { status: 400 });
 		}
 		
-		// Save to database
 		const uploadedFile = await prisma.uploadedFile.create({
 			data: {
 				title: title.trim(),
@@ -42,7 +66,7 @@ export const POST = async ({ request }: RequestEvent) => {
 				provider: provider as any,
 				roles: roles as any,
 				fileName,
-				filePath, // This will be the UploadThing URL
+				filePath,
 				fileSize,
 				mimeType
 			}

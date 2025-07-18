@@ -2,10 +2,15 @@
 	import FileViewer from './FileViewer.svelte';
 	
 	export let files: any[] = [];
+	export let pagination: any = null;
 	export let onRefresh: (() => void) | undefined = undefined;
+	export let onPageChange: ((page: number) => void) | undefined = undefined;
+	export let onPageSizeChange: ((pageSize: number) => void) | undefined = undefined;
 	
 	let selectedFile: any = null;
 	let isViewerOpen = false;
+	
+	const pageSizeOptions = [5, 10, 20, 50];
 	
 	function formatFileSize(bytes: number): string {
 		if (bytes === 0) return '0 Bytes';
@@ -174,6 +179,86 @@
 				</tbody>
 			</table>
 		</div>
+		
+		{#if pagination}
+			<div class="pagination-container">
+				<div class="pagination-info">
+					<span class="results-count">
+						Showing {((pagination.currentPage - 1) * pagination.pageSize) + 1} - 
+						{Math.min(pagination.currentPage * pagination.pageSize, pagination.totalCount)} 
+						of {pagination.totalCount} files
+					</span>
+					
+					<div class="page-size-selector">
+						<label for="pageSize">Show:</label>
+						<select 
+							id="pageSize" 
+							value={pagination.pageSize} 
+							on:change={(e) => onPageSizeChange?.(parseInt(e.currentTarget.value))}
+						>
+							{#each pageSizeOptions as size}
+								<option value={size}>{size}</option>
+							{/each}
+						</select>
+						<span>per page</span>
+					</div>
+				</div>
+				
+				<div class="pagination-controls">
+					<button 
+						class="pagination-btn" 
+						class:disabled={!pagination.hasPreviousPage}
+						disabled={!pagination.hasPreviousPage}
+						on:click={() => onPageChange?.(1)}
+					>
+						⟪
+					</button>
+					
+					<button 
+						class="pagination-btn" 
+						class:disabled={!pagination.hasPreviousPage}
+						disabled={!pagination.hasPreviousPage}
+						on:click={() => onPageChange?.(pagination.currentPage - 1)}
+					>
+						‹ Previous
+					</button>
+					
+					<div class="page-numbers">
+						{#each Array.from({length: Math.min(5, pagination.totalPages)}, (_, i) => {
+							const start = Math.max(1, pagination.currentPage - 2);
+							const end = Math.min(pagination.totalPages, start + 4);
+							return start + i <= end ? start + i : null;
+						}).filter(Boolean) as pageNum}
+							<button 
+								class="page-number" 
+								class:current={pageNum === pagination.currentPage}
+								on:click={() => onPageChange?.(pageNum)}
+							>
+								{pageNum}
+							</button>
+						{/each}
+					</div>
+					
+					<button 
+						class="pagination-btn" 
+						class:disabled={!pagination.hasNextPage}
+						disabled={!pagination.hasNextPage}
+						on:click={() => onPageChange?.(pagination.currentPage + 1)}
+					>
+						Next ›
+					</button>
+					
+					<button 
+						class="pagination-btn" 
+						class:disabled={!pagination.hasNextPage}
+						disabled={!pagination.hasNextPage}
+						on:click={() => onPageChange?.(pagination.totalPages)}
+					>
+						⟫
+					</button>
+				</div>
+			</div>
+		{/if}
 	{/if}
 </div>
 
@@ -371,10 +456,147 @@
 		box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 	}
 	
+	/* Pagination Styles */
+	.pagination-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20px 32px;
+		border-top: 1px solid var(--border-light);
+		background: var(--background-white);
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+	
+	.pagination-info {
+		display: flex;
+		align-items: center;
+		gap: 24px;
+		color: var(--text-secondary);
+		font-size: 14px;
+	}
+	
+	.results-count {
+		font-weight: 500;
+	}
+	
+	.page-size-selector {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	
+	.page-size-selector select {
+		padding: 6px 12px;
+		border: 1px solid var(--border-light);
+		border-radius: 8px;
+		background: var(--background-white);
+		color: var(--text-primary);
+		font-size: 14px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	
+	.page-size-selector select:hover {
+		border-color: var(--primary-orange);
+	}
+	
+	.page-size-selector select:focus {
+		outline: none;
+		border-color: var(--primary-orange);
+		box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+	}
+	
+	.pagination-controls {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	
+	.pagination-btn {
+		padding: 8px 16px;
+		border: 1px solid var(--border-light);
+		border-radius: 8px;
+		background: var(--background-white);
+		color: var(--text-primary);
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		min-width: 44px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.pagination-btn:hover:not(.disabled) {
+		background: var(--primary-orange);
+		color: white;
+		border-color: var(--primary-orange);
+		transform: translateY(-1px);
+	}
+	
+	.pagination-btn.disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		background: var(--background-gray);
+		color: var(--text-disabled);
+	}
+	
+	.page-numbers {
+		display: flex;
+		gap: 4px;
+		margin: 0 8px;
+	}
+	
+	.page-number {
+		width: 40px;
+		height: 40px;
+		border: 1px solid var(--border-light);
+		border-radius: 8px;
+		background: var(--background-white);
+		color: var(--text-primary);
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.page-number:hover {
+		background: var(--background-gray);
+		border-color: var(--primary-orange);
+	}
+	
+	.page-number.current {
+		background: var(--primary-orange);
+		color: white;
+		border-color: var(--primary-orange);
+	}
+	
 	@media (max-width: 1024px) {
 		.table-container {
 			margin: 20px;
 			border-radius: 12px;
+		}
+		
+		.pagination-container {
+			padding: 16px 20px;
+			flex-direction: column;
+			align-items: stretch;
+			gap: 16px;
+		}
+		
+		.pagination-info {
+			justify-content: space-between;
+			flex-wrap: wrap;
+		}
+		
+		.pagination-controls {
+			justify-content: center;
 		}
 	}
 	
@@ -404,6 +626,39 @@
 		.provider-badge {
 			font-size: 10px;
 			padding: 4px 8px;
+		}
+		
+		.pagination-container {
+			padding: 12px 16px;
+		}
+		
+		.pagination-info {
+			font-size: 12px;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 12px;
+		}
+		
+		.pagination-controls {
+			flex-wrap: wrap;
+			gap: 4px;
+		}
+		
+		.pagination-btn {
+			padding: 6px 12px;
+			font-size: 12px;
+			min-width: 36px;
+			height: 36px;
+		}
+		
+		.page-number {
+			width: 36px;
+			height: 36px;
+			font-size: 12px;
+		}
+		
+		.page-numbers {
+			margin: 0 4px;
 		}
 	}
 </style>

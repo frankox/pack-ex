@@ -5,14 +5,26 @@
 	import Modal from '$lib/components/Modal.svelte';
 	
 	let files: any[] = [];
+	let pagination: any = null;
 	let showUploadModal = false;
 	let loading = true;
+	
+	// Pagination state
+	let currentPage = 1;
+	let pageSize = 10;
 	
 	async function loadFiles() {
 		try {
 			loading = true;
-			const response = await fetch('/api/files');
-			files = await response.json();
+			const response = await fetch(`/api/files?page=${currentPage}&pageSize=${pageSize}`);
+			const data = await response.json();
+			
+			if (response.ok) {
+				files = data.files;
+				pagination = data.pagination;
+			} else {
+				console.error('Error loading files:', data.error);
+			}
 		} catch (error) {
 			console.error('Error loading files:', error);
 		} finally {
@@ -22,6 +34,19 @@
 	
 	function handleUploadSuccess() {
 		showUploadModal = false;
+		// Reset to first page when a new file is uploaded
+		currentPage = 1;
+		loadFiles();
+	}
+	
+	function handlePageChange(page: number) {
+		currentPage = page;
+		loadFiles();
+	}
+	
+	function handlePageSizeChange(newPageSize: number) {
+		pageSize = newPageSize;
+		currentPage = 1; // Reset to first page when changing page size
 		loadFiles();
 	}
 	
@@ -36,7 +61,6 @@
 	<div class="content-section">
 		<div class="main-card">
 			<div class="card-header">
-				<h2 class="card-title">File Manager</h2>
 				<button 
 					class="upload-btn" 
 					on:click={() => showUploadModal = true}
@@ -53,7 +77,13 @@
 						</div>
 					</div>		
 				{:else}
-					<FileTable {files} onRefresh={loadFiles} />
+					<FileTable 
+						{files} 
+						{pagination}
+						onRefresh={loadFiles} 
+						onPageChange={handlePageChange}
+						onPageSizeChange={handlePageSizeChange}
+					/>
 				{/if}
 			</div>
 		</div>
@@ -97,28 +127,8 @@
 		background: var(--background-white);
 	}
 	
-	.card-title {
-		margin: 0;
-		font-size: 24px;
-		font-weight: 700;
-		color: var(--text-primary);
-	}
-	
 	.card-content {
 		padding: 0;
-	}
-	
-	.action-bar {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 32px;
-		padding: 24px 32px;
-		background: var(--background-white);
-		border-radius: 16px;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-		border: 1px solid var(--border-light);
 	}
 	
 	.upload-btn {
@@ -194,10 +204,6 @@
 			gap: 20px;
 			padding: 20px;
 			text-align: center;
-		}
-		
-		.card-title {
-			font-size: 20px;
 		}
 		
 		.upload-btn {
