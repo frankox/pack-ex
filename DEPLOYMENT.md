@@ -20,16 +20,42 @@ UploadThing is already configured for your PackEx application:
 
 When deploying, ensure these environment variables are set:
 
+### For Vercel and Platforms that Support Special Characters
 ```bash
-# Database
-DATABASE_URL=postgresql://neondb_owner:npg_o4eBfnasCY7u@ep-bitter-cloud-ab0tp6dh-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+# Database (Base64 encoded for better compatibility)
+DATABASE_URL_BASE64=cG9zdGdyZXNxbDovL25lb25kYl9vd25lcjpucGdfbzRlQmZuYXNDWTd1QGVwLWJpdHRlci1jbG91ZC1hYjB0cDZkaC1wb29sZXIuZXUtd2VzdC0yLmF3cy5uZW9uLnRlY2gvbmVvbmRiP3NzbG1vZGU9cmVxdWlyZSZjaGFubmVsX2JpbmRpbmc9cmVxdWlyZQ==
 
 # UploadThing Configuration
-UPLOADTHING_TOKEN='asdasdasd'
+UPLOADTHING_TOKEN='eyJhcGlLZXkiOiJza19saXZlX2E2OTFjYjQ4ODQ1ZmYzYjcxMmQ2YmIyMzFiYjk4MjczM2E5MjFjMjAzMGNkNjEwNGQ1MTc1Y2YzNmI0ZmI4MmEiLCJhcHBJZCI6Im4zejcwZW8zZjUiLCJyZWdpb25zIjpbInNlYTEiXX0='
 
 # Application Settings
 NODE_ENV=production
-SESSION_SECRET=your-strong-random-secret-key
+CORS_ORIGIN=https://your-app-domain.vercel.app
+```
+
+### Alternative: Plain Text (if your platform supports it)
+```bash
+# Database (plain text - may not work on some platforms like Vercel)
+DATABASE_URL="postgresql://neondb_owner:npg_o4eBfnasCY7u@ep-bitter-cloud-ab0tp6dh-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
+# UploadThing Configuration
+UPLOADTHING_TOKEN='eyJhcGlLZXkiOiJza19saXZlX2E2OTFjYjQ4ODQ1ZmYzYjcxMmQ2YmIyMzFiYjk4MjczM2E5MjFjMjAzMGNkNjEwNGQ1MTc1Y2YzNmI0ZmI4MmEiLCJhcHBJZCI6Im4zejcwZW8zZjUiLCJyZWdpb25zIjpbInNlYTEiXX0='
+
+# Application Settings
+NODE_ENV=production
+```
+
+### Database URL Encoding
+Our application supports both plain text and base64 encoded database URLs. For platforms like Vercel that have issues with special characters in environment variables, use the base64 encoded version (`DATABASE_URL_BASE64`).
+
+To encode a new database URL:
+```bash
+node scripts/db-url-encoder.js encode "your-database-url-here"
+```
+
+To decode a base64 URL:
+```bash
+node scripts/db-url-encoder.js decode "base64-string-here"
 ```
 
 ## UploadThing Benefits
@@ -122,10 +148,16 @@ npm run build
 
 | Variable | Description | Required | Example |
 |----------|-------------|----------|---------|
-| DATABASE_URL | Neon PostgreSQL connection string | Yes | postgresql://... |
+| DATABASE_URL | Neon PostgreSQL connection string (plain text) | No* | postgresql://user:pass@host:5432/db |
+| DATABASE_URL_BASE64 | Base64 encoded database URL (recommended for Vercel) | No* | cG9zdGdyZXNxbDov... |
 | UPLOADTHING_TOKEN | UploadThing API token | Yes | eyJhcGlLZXk... |
-| SESSION_SECRET | Secret for session encryption | Yes | random-secret-key |
 | NODE_ENV | Environment mode | No | production |
+| CORS_ORIGIN | Allowed CORS origin | No | https://yourdomain.com |
+| LOG_LEVEL | Logging level | No | info |
+| RATE_LIMIT_WINDOW_MS | Rate limiting window in ms | No | 900000 |
+| RATE_LIMIT_MAX_REQUESTS | Max requests per window | No | 100 |
+
+*Either DATABASE_URL or DATABASE_URL_BASE64 is required. The application will automatically use the base64 encoded version if available, otherwise fall back to the plain text version.
 
 ## File Upload Limits
 
