@@ -76,7 +76,7 @@ button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.1);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
 }
 
 /* Input and form styling */
@@ -92,8 +92,8 @@ input, select, textarea {
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: var(--primary-orange);
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* Cards and containers */

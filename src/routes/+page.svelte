@@ -6,13 +6,17 @@
 	
 	let files: any[] = [];
 	let showUploadModal = false;
+	let loading = true;
 	
 	async function loadFiles() {
 		try {
+			loading = true;
 			const response = await fetch('/api/files');
 			files = await response.json();
 		} catch (error) {
 			console.error('Error loading files:', error);
+		} finally {
+			loading = false;
 		}
 	}
 	
@@ -55,7 +59,16 @@
 		</Modal>
 		
 		<div class="files-section">
-			<FileTable {files} onRefresh={loadFiles} />
+			{#if loading}
+				<div class="loader-container">
+					<div class="loader">
+						<div class="spinner"></div>
+						<p class="loading-text">Loading files...</p>
+					</div>
+				</div>
+			{:else}
+				<FileTable {files} onRefresh={loadFiles} />
+			{/if}
 		</div>
 	</div>
 </div>
@@ -137,6 +150,45 @@
 	
 	.files-section {
 		background: transparent;
+	}
+	
+	.loader-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 400px;
+		background: var(--background-white);
+		border-radius: 16px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		border: 1px solid var(--border-light);
+	}
+	
+	.loader {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 16px;
+	}
+	
+	.spinner {
+		width: 48px;
+		height: 48px;
+		border: 4px solid var(--border-light);
+		border-top: 4px solid var(--primary-orange);
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+	}
+	
+	.loading-text {
+		color: var(--text-secondary);
+		font-size: 16px;
+		font-weight: 500;
+		margin: 0;
+	}
+	
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
 	}
 	
 	@media (max-width: 768px) {
