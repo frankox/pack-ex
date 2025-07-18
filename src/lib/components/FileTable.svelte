@@ -121,7 +121,6 @@
 	}
 	
 	function getSortIcon(column: string): string {
-		if (sortBy !== column) return '↕️';
 		return sortOrder === 'asc' ? '↑' : '↓';
 	}
 </script>
@@ -409,11 +408,6 @@
 		color: var(--primary-orange);
 	}
 	
-	.sortable-header.active {
-		background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
-		color: white;
-	}
-	
 	.header-content {
 		display: flex;
 		align-items: center;
@@ -429,11 +423,6 @@
 	
 	.sortable-header:hover .sort-icon {
 		opacity: 1;
-	}
-	
-	.sortable-header.active .sort-icon {
-		opacity: 1;
-		font-weight: bold;
 	}
 	
 	.files-table td {
