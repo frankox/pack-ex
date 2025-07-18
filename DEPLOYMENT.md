@@ -23,7 +23,7 @@ When deploying, ensure these environment variables are set:
 ### For Vercel and Platforms that Support Special Characters
 ```bash
 # Database (Base64 encoded for better compatibility)
-DATABASE_URL_BASE64=cG9zdGdyZXNxbDovL25lb25kYl9vd25lcjpucGdfbzRlQmZuYXNDWTd1QGVwLWJpdHRlci1jbG91ZC1hYjB0cDZkaC1wb29sZXIuZXUtd2VzdC0yLmF3cy5uZW9uLnRlY2gvbmVvbmRiP3NzbG1vZGU9cmVxdWlyZSZjaGFubmVsX2JpbmRpbmc9cmVxdWlyZQ==
+DATABASE_URL_BASE64=cG9zdGdyZXNxbDovL25lb25kYl9vd25lcjpucGdfbzRlQmZuYXNDWT==
 
 # UploadThing Configuration
 UPLOADTHING_TOKEN='eyJhcGlLZXkiOiJza19saXZlX2E2OTFjYjQ4ODQ1ZmYzYjcxMmQ2YmIyMzFiYjk4MjczM2E5MjFjMjAzMGNkNjEwNGQ1MTc1Y2YzNmI0ZmI4MmEiLCJhcHBJZCI6Im4zejcwZW8zZjUiLCJyZWdpb25zIjpbInNlYTEiXX0='

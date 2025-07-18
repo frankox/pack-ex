@@ -4,12 +4,7 @@
  * need to be base64 encoded
  */
 
-/**
- * Get the decoded database URL from environment variables
- * Supports both base64 encoded (DATABASE_URL_BASE64) and plain text (DATABASE_URL) formats
- */
 export function getDatabaseUrl(): string {
-	// First try to get base64 encoded URL (preferred for production)
 	const base64Url = process.env.DATABASE_URL_BASE64;
 	if (base64Url) {
 		try {
