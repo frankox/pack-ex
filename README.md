@@ -43,7 +43,7 @@ A modern file upload and management application built with SvelteKit, TypeScript
    make setup
    ```
 
-3. **Configure environment** (set your UploadThing token):
+3. **Configure environment** (for Docker setup):
    ```bash
    cp .env.example .env
    # Edit .env and add your UPLOADTHING_TOKEN
@@ -67,9 +67,9 @@ A modern file upload and management application built with SvelteKit, TypeScript
    npm install
    ```
 
-3. **Configure environment**:
+3. **Configure environment** (for cloud database):
    ```bash
-   cp .env.example .env
+   cp .env.cloud.example .env
    # Edit .env with your DATABASE_URL and UPLOADTHING_TOKEN
    ```
 
@@ -87,17 +87,33 @@ A modern file upload and management application built with SvelteKit, TypeScript
 - **App**: http://localhost:5173
 - **Database** (if using Docker): localhost:5432
 
-### Available Commands (Docker Setup)
+### Available Commands
 
 | Command | Description |
 |---------|-------------|
 | `make help` | Show all available commands |
-| `make setup` | Initial project setup (first-time only) |
-| `make dev` | Start development environment |
+| `make setup` | Initial project setup with Docker database |
+| `make setup-local` | Initial project setup for Docker-free environment |
+| `make dev` | Start development environment (with Docker database) |
+| `make dev-local` | Start development environment (Docker-free, cloud DB) |
 | `make start-docker` | Start only the database container |
 | `make stop-docker` | Stop Docker services |
 | `make clean` | Clean up Docker containers and volumes |
-| `npm run configure-storage` | Interactive storage provider configuration |
+
+### Quick Commands
+
+**With Docker (Local Database):**
+```bash
+make setup     # First-time setup
+make dev       # Start development
+```
+
+**Docker-free (Cloud Database):**
+```bash
+# Configure your DATABASE_URL in .env first
+make setup-local  # First-time setup
+make dev-local    # Start development
+```
 
 ### Alternative Setup (Manual)
 
@@ -196,32 +212,19 @@ pack-ex/
 
 ## Environment Configuration
 
-PackEx provides multiple environment configuration files for different deployment scenarios:
-
-### Environment Files
+PackEx provides different environment templates for different setups:
 
 | File | Purpose | Usage |
 |------|---------|-------|
-| `.env` | Default configuration | Development fallback |
-| `.env.local` | Local development | Docker development environment |
-| `.env.production` | Production deployment | Google Drive storage configuration |
-| `.env.example` | Template file | Shows all available options |
+| `.env.example` | Docker setup template | Local development with Docker PostgreSQL |
+| `.env.cloud.example` | Cloud setup template | Docker-free development with cloud database |
+| `.env.local` | Local development | Current local configuration |
+| `.env.production` | Production deployment | Production environment with Neon database |
 
-### Setup Instructions
+Choose the appropriate template based on your development approach:
 
-1. **For Local Development with Docker**:
-   ```bash
-   cp .env.local .env
-   # Edit .env if needed, then start development
-   make dev
-   ```
-
-2. **For Production with Google Drive**:
-   ```bash
-   cp .env.production .env
-   # Configure Google Drive credentials (see CLOUD_STORAGE.md)
-   # Deploy to your production environment
-   ```
+- **Docker development**: `cp .env.example .env`
+- **Cloud development**: `cp .env.cloud.example .env`
 
 ### Storage Configuration
 

@@ -1,4 +1,4 @@
-.PHONY: dev start-docker stop-docker setup clean help
+.PHONY: dev start-docker stop-docker setup clean help dev-local setup-local
 
 # Default target
 .DEFAULT_GOAL := help
@@ -39,13 +39,26 @@ dev: start-docker
 	@echo "$(YELLOW)Access the app at: http://localhost:5173$(NC)"
 	@npm run dev
 
+# Docker-free development command
+dev-local:
+	@echo "$(YELLOW)Setting up Docker-free development environment...$(NC)"
+	@echo "$(YELLOW)Installing dependencies...$(NC)"
+	@npm install --registry https://registry.npmjs.org/ > /dev/null 2>&1 || true
+	@echo "$(YELLOW)Running database migrations...$(NC)"
+	@npm run db:generate > /dev/null 2>&1 || true
+	@npm run db:push > /dev/null 2>&1 || true
+	@echo "$(GREEN)Starting development server...$(NC)"
+	@echo "$(YELLOW)Access the app at: http://localhost:5173$(NC)"
+	@echo "$(YELLOW)Note: Make sure your DATABASE_URL in .env points to a valid database$(NC)"
+	@npm run dev
+
 # Stop Docker services
 stop-docker:
 	@echo "$(YELLOW)Stopping Docker services...$(NC)"
 	@docker-compose down
 	@echo "$(GREEN)Docker services stopped!$(NC)"
 
-# Setup the project (install dependencies and prepare database)
+# Setup the project with Docker (install dependencies and prepare database)
 setup: check-docker
 	@echo "$(YELLOW)Installing dependencies...$(NC)"
 	@npm install --registry https://registry.npmjs.org/
@@ -58,6 +71,17 @@ setup: check-docker
 	@npm run db:migrate
 	@echo "$(GREEN)Setup complete! Run 'make dev' to start development.$(NC)"
 
+# Docker-free setup (for cloud database usage)
+setup-local:
+	@echo "$(YELLOW)Setting up Docker-free environment...$(NC)"
+	@echo "$(YELLOW)Installing dependencies...$(NC)"
+	@npm install --registry https://registry.npmjs.org/
+	@echo "$(YELLOW)Setting up database schema...$(NC)"
+	@npm run db:generate
+	@npm run db:push
+	@echo "$(GREEN)Setup complete! Run 'make dev-local' to start development.$(NC)"
+	@echo "$(YELLOW)Note: Make sure your DATABASE_URL in .env points to a valid database$(NC)"
+
 # Clean up Docker containers and volumes
 clean:
 	@echo "$(YELLOW)Cleaning up Docker containers and volumes...$(NC)"
@@ -69,14 +93,21 @@ clean:
 help:
 	@echo "$(GREEN)PackEx - Available commands:$(NC)"
 	@echo ""
-	@echo "  $(YELLOW)make dev$(NC)        - Start development environment (database + dev server)"
-	@echo "  $(YELLOW)make setup$(NC)      - Initial project setup (install deps, setup database)"
+	@echo "  $(YELLOW)make dev$(NC)        - Start development environment (with Docker database)"
+	@echo "  $(YELLOW)make dev-local$(NC)  - Start development environment (Docker-free, cloud DB)"
+	@echo "  $(YELLOW)make setup$(NC)      - Initial project setup with Docker database"
+	@echo "  $(YELLOW)make setup-local$(NC) - Initial project setup for Docker-free environment"
 	@echo "  $(YELLOW)make start-docker$(NC) - Start only Docker services (database)"
 	@echo "  $(YELLOW)make stop-docker$(NC) - Stop Docker services"
 	@echo "  $(YELLOW)make clean$(NC)      - Clean up Docker containers and volumes"
 	@echo "  $(YELLOW)make help$(NC)       - Show this help message"
 	@echo ""
-	@echo "$(GREEN)Quick start:$(NC)"
+	@echo "$(GREEN)Quick start (with Docker):$(NC)"
 	@echo "  1. Run '$(YELLOW)make setup$(NC)' for first-time setup"
 	@echo "  2. Run '$(YELLOW)make dev$(NC)' to start development"
+	@echo ""
+	@echo "$(GREEN)Quick start (Docker-free):$(NC)"
+	@echo "  1. Configure your DATABASE_URL: '$(YELLOW)cp .env.cloud.example .env$(NC)'"
+	@echo "  2. Run '$(YELLOW)make setup-local$(NC)' for first-time setup"
+	@echo "  3. Run '$(YELLOW)make dev-local$(NC)' to start development"
 	@echo ""
