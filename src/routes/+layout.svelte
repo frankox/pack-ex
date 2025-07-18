@@ -12,9 +12,6 @@
 					<p>File Upload Manager</p>
 				</div>
 			</div>
-			<div class="header-description">
-				<p>Professional content management and sharing platform</p>
-			</div>
 		</div>
 	</header>
 	
@@ -62,27 +59,15 @@
 		margin: 0 0 4px 0;
 		font-size: 2rem;
 		font-weight: 700;
-		color: white;
+		color: rgb(0, 0, 0);
 		line-height: 1.2;
 	}
 	
 	.brand-info p {
 		margin: 0;
-		color: rgba(255, 255, 255, 0.9);
+		color: rgb(0, 0, 0);
 		font-size: 1rem;
 		font-weight: 500;
-	}
-	
-	.header-description {
-		text-align: right;
-	}
-	
-	.header-description p {
-		margin: 0;
-		color: rgba(255, 255, 255, 0.85);
-		font-size: 1.1rem;
-		font-weight: 400;
-		max-width: 300px;
 	}
 	
 	@media (max-width: 768px) {
@@ -90,14 +75,6 @@
 			flex-direction: column;
 			text-align: center;
 			padding: 24px 20px;
-		}
-		
-		.header-description {
-			text-align: center;
-		}
-		
-		.header-description p {
-			max-width: none;
 		}
 		
 		.logo-section {

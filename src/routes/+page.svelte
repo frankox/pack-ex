@@ -34,20 +34,28 @@
 
 <div class="page-container">
 	<div class="content-section">
-		<div class="action-bar">
-			<div class="stats-info">
-				<div class="stat-item">
-					<span class="stat-number">{files.length}</span>
-					<span class="stat-label">Files Uploaded</span>
-				</div>
+		<div class="main-card">
+			<div class="card-header">
+				<h2 class="card-title">File Manager</h2>
+				<button 
+					class="upload-btn" 
+					on:click={() => showUploadModal = true}
+				>
+					<span class="btn-text">Upload</span>
+				</button>
 			</div>
-			<button 
-				class="upload-btn" 
-				on:click={() => showUploadModal = true}
-			>
-				<span class="btn-icon">📁</span>
-				Upload New File
-			</button>
+			<div class="card-content">
+				{#if loading}
+					<div class="loader-container">
+						<div class="loader">
+							<div class="spinner"></div>
+							<p class="loading-text">Loading files...</p>
+						</div>
+					</div>		
+				{:else}
+					<FileTable {files} onRefresh={loadFiles} />
+				{/if}
+			</div>
 		</div>
 		
 		<Modal 
@@ -58,18 +66,6 @@
 			<UploadForm onSuccess={handleUploadSuccess} />
 		</Modal>
 		
-		<div class="files-section">
-			{#if loading}
-				<div class="loader-container">
-					<div class="loader">
-						<div class="spinner"></div>
-						<p class="loading-text">Loading files...</p>
-					</div>
-				</div>
-			{:else}
-				<FileTable {files} onRefresh={loadFiles} />
-			{/if}
-		</div>
 	</div>
 </div>
 
@@ -84,8 +80,37 @@
 		padding: 32px 24px;
 	}
 	
+	.main-card {
+		background: var(--background-white);
+		border-radius: 16px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		border: 1px solid var(--border-light);
+		overflow: hidden;
+	}
+	
+	.card-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 24px 32px;
+		border-bottom: 1px solid var(--border-light);
+		background: var(--background-white);
+	}
+	
+	.card-title {
+		margin: 0;
+		font-size: 24px;
+		font-weight: 700;
+		color: var(--text-primary);
+	}
+	
+	.card-content {
+		padding: 0;
+	}
+	
 	.action-bar {
 		display: flex;
+		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 32px;
@@ -94,33 +119,6 @@
 		border-radius: 16px;
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 		border: 1px solid var(--border-light);
-	}
-	
-	.stats-info {
-		display: flex;
-		gap: 32px;
-	}
-	
-	.stat-item {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-	}
-	
-	.stat-number {
-		font-size: 2rem;
-		font-weight: 700;
-		color: var(--primary-orange);
-		line-height: 1;
-	}
-	
-	.stat-label {
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin-top: 4px;
 	}
 	
 	.upload-btn {
@@ -144,12 +142,10 @@
 		box-shadow: 0 8px 25px rgba(234, 88, 12, 0.35);
 	}
 	
-	.btn-icon {
-		font-size: 18px;
-	}
-	
-	.files-section {
-		background: transparent;
+	.btn-text {
+		font-size: 20px;
+		font-weight: 600;
+		color: white;
 	}
 	
 	.loader-container {
@@ -157,10 +153,7 @@
 		justify-content: center;
 		align-items: center;
 		min-height: 400px;
-		background: var(--background-white);
-		border-radius: 16px;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-		border: 1px solid var(--border-light);
+		padding: 32px;
 	}
 	
 	.loader {
@@ -196,19 +189,15 @@
 			padding: 20px 16px;
 		}
 		
-		.action-bar {
+		.card-header {
 			flex-direction: column;
 			gap: 20px;
 			padding: 20px;
 			text-align: center;
 		}
 		
-		.stats-info {
-			justify-content: center;
-		}
-		
-		.stat-number {
-			font-size: 1.75rem;
+		.card-title {
+			font-size: 20px;
 		}
 		
 		.upload-btn {
