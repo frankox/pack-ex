@@ -2,18 +2,6 @@
 
 A modern file upload and management application built with SvelteKit, TypeScript, PostgreSQL, and flexible storage options. Simple, fast, and reliable file uploads with support for both cloud and local storage.
 
-## 🚀 Quick Start
-
-**Get started in seconds:**
-
-```bash
-# Local setup (no external services needed)
-git clone <your-repo> && cd pack-ex && make local
-
-# Cloud setup (with UploadThing CDN)
-git clone <your-repo> && cd pack-ex && make cloud
-```
-
 ## Features
 
 - **File Upload**: Upload various file types (PDF, TXT, DOC, DOCX, PPT, PPTX, MP4, MOV, AVI, ZIP, Images)
@@ -114,19 +102,6 @@ make cloud
 | `make stop-docker` | Stop Docker services |
 | `make clean` | Clean up Docker containers and volumes |
 | `make help` | Show all available commands |
-
-### Quick Commands
-
-**🐳 Local Development (Recommended):**
-```bash
-make local     # One command setup + start
-```
-
-**☁️ Cloud Development:**
-```bash
-make cloud     # One command setup + start
-# Remember to add UPLOADTHING_TOKEN to .env
-```
 
 ### Alternative Setup (Manual)
 
@@ -281,40 +256,6 @@ pack-ex/
 ├── DEPLOYMENT.md                      # Deployment guide
 ├── STORAGE_IMPLEMENTATION.md          # Storage system docs
 └── README.md                          # This file
-```
-
-## Environment Configuration
-
-PackEx automatically configures the appropriate environment based on your chosen setup:
-
-### Local Storage Environment (.env.local.example)
-```bash
-# Storage Configuration - Use local storage by default
-STORAGE_PROVIDER=local
-
-# Database (Docker PostgreSQL)
-DATABASE_URL="postgresql://packex_user:packex_password@db:5432/packex_db?schema=public"
-
-# Local file storage settings
-UPLOADS_DIR=/app/uploads
-PUBLIC_URL=http://localhost:3000
-
-# Security
-SESSION_SECRET=your-strong-secret-change-in-production
-```
-
-### Cloud Environment (.env.cloud.example)
-```bash
-# Storage Configuration - Use UploadThing CDN
-STORAGE_PROVIDER=uploadthing
-UPLOADTHING_TOKEN=your_uploadthing_token_here
-
-# Database (Neon PostgreSQL)
-DATABASE_URL="postgresql://neondb_owner:npg_o4eBfna...@ep-bitter-cloud...neon.tech/neondb?sslmode=require"
-
-# Security
-SESSION_SECRET=your-strong-secret-change-in-production
-```
 
 ### Environment Files
 
@@ -323,6 +264,8 @@ SESSION_SECRET=your-strong-secret-change-in-production
 | `.env.local.example` | `make local` | Docker + Local storage template |
 | `.env.cloud.example` | `make cloud` | Cloud services template |
 | `.env` | Application | Active configuration (auto-created) |
+
+If you choose to use make commands, be sure to create also the env.local and the env.cloud. This files will be copied inside .env file to activate a specific config.
 
 ## Development
 
@@ -346,21 +289,6 @@ npm run db:migrate
 - **Required Fields**: Title, Description, Category, Language, Provider, Roles
 - **Character Limits**: Title (200 chars), Description (1000 chars)
 
-## Deployment
-
-### Production Build
-
-```bash
-npm run build
-node build
-```
-
-### Docker Production
-
-```bash
-docker-compose -f docker-compose.yml up -d
-```
-
 ## Security Considerations
 
 - File type validation
@@ -374,12 +302,7 @@ docker-compose -f docker-compose.yml up -d
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
 5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details.
 
 ## Support
 
